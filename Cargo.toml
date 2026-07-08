@@ -24,7 +24,7 @@ oximqtt-utils = { path = "oximqtt-utils" }
 [workspace.package]
 version = "0.22.0"
 edition = "2021"
-authors = ["oximqtt <oximqttd@126.com>"]
+authors = ["oximqtt <zeaphoo@qq.com>"]
 description = "MQTT Server for v3.1, v3.1.1 and v5.0 protocols"
 repository = "https://github.com/zeaphoo/oximqtt.git"
 license = "MIT OR Apache-2.0"

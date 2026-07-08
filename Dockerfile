@@ -6,7 +6,7 @@ RUN cargo build --release
 
 
 FROM alpine:3.21
-LABEL maintainer="oximqtt <oximqttd@126.com>"
+LABEL maintainer="oximqtt <zeaphoo@qq.com>"
 
 RUN mkdir -p /app/oximqtt/oximqtt-bin
 COPY --from=builder /oximqtt/target/release/oximqttd /app/oximqtt/oximqtt-bin/
