@@ -66,21 +66,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download all artifacts
+      - name: Download amd64 artifact
         uses: actions/download-artifact@v4
         with:
-          path: artifacts
-          merge-multiple: true
+          name: oximqtt-linux-amd64
+          path: amd64
+
+      - name: Download arm64 artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: oximqtt-linux-arm64
+          path: arm64
 
       - name: Create archives
         run: |
-          cd artifacts
-          tar -czvf ../oximqtt-linux-amd64.tar.gz oximqttd oximqtt.toml
-          # Separate arm64 if present
-          if [ -d "oximqtt-linux-arm64" ]; then
-            cd oximqtt-linux-arm64
-            tar -czvf ../../oximqtt-linux-arm64.tar.gz oximqttd oximqtt.toml
-          fi
+          tar -czvf oximqtt-linux-amd64.tar.gz -C amd64 oximqttd oximqtt.toml
+          tar -czvf oximqtt-linux-arm64.tar.gz -C arm64 oximqttd oximqtt.toml
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
