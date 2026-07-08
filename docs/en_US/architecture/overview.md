@@ -17,14 +17,14 @@ graph TB
         QUIC[QUIC Clients]
     end
 
-    subgraph "Network Layer (oximqtt-net)"
+    subgraph "Network Layer (oximqtt::net)"
         Builder[Builder API<br/>Listener Configuration]
         Listener[TCP/TLS/WS/WSS/QUIC<br/>Listeners]
         Acceptor[Acceptor<br/>Per-Connection Handler]
         Dispatcher[Protocol Dispatcher<br/>v3/v5 Version Negotiation]
     end
 
-    subgraph "Protocol Layer (oximqtt-codec)"
+    subgraph "Protocol Layer (oximqtt::codec)"
         Codec[MqttCodec<br/>Encoder/Decoder]
         V3[v3::Codec<br/>MQTT 3.1.1]
         V5[v5::Codec<br/>MQTT 5.0]
@@ -42,22 +42,17 @@ graph TB
         Executor[Task Executor<br/>Async Task Queue]
     end
 
-    subgraph "Configuration (oximqtt-conf)"
+    subgraph "Configuration (oximqtt::conf)"
         Settings[Settings<br/>Singleton Config]
         Options[Options<br/>CLI Parser]
         ListenerCfg[Listener Config<br/>Per-protocol Settings]
     end
 
-    subgraph "Storage Plugins"
-        Retain[Retainer<br/>RAM/Sled/Redis]
-        MsgStore[Message Store<br/>RAM/Redis/Redis Cluster]
-        SessionStore[Session Store<br/>Sled/Redis/Redis Cluster]
-    end
-
-    subgraph "Cluster Plugins"
-        Raft[Raft Consensus<br/>Strong Consistency]
-        Broadcast[Broadcast<br/>High Throughput]
-        gRPC[gRPC Inter-node<br/>Communication]
+    subgraph "Built-in Modules"
+        ACL[ACL<br/>Access Control]
+        Retainer[Retainer<br/>Retained Messages]
+        SysTopic[Sys Topic<br/>$SYS Publishing]
+        AuthJWT[JWT Auth<br/>Token Validation]
     end
 
     MQTT & TLS & WS & QUIC --> Listener
@@ -80,9 +75,7 @@ graph TB
     Router --> Queue
     Queue --> Inflight
 
-    Session -.-> Retain & MsgStore & SessionStore
-    Router -.-> Raft & Broadcast
-    Raft & Broadcast -.-> gRPC
+    Session -.-> ACL & Retainer & SysTopic & AuthJWT
 ```
 
 ---
@@ -150,14 +143,12 @@ oximqtt/src/
 ├── args.rs          # Command-line argument struct
 ├── shared.rs        # Shared subscriptions ($share/)
 │
-├── delayed.rs       # [feature: delayed] Delayed publish
-├── grpc.rs          # [feature: grpc] gRPC communication
-├── message.rs       # [feature: msgstore] Message storage
-├── metrics.rs       # [feature: metrics] Metrics collection
+├── delayed.rs       # Delayed publish
+├── metrics.rs       # Metrics collection
 ├── builtins/        # Built-in modules (acl, auth_jwt, retainer, sys_topic)
-├── retain.rs        # [feature: retain] Retained messages
-├── stats.rs         # [feature: stats] Runtime statistics
-└── subscribe.rs     # [feature: *-subscription] Subscription helpers
+├── retain.rs        # Retained messages
+├── stats.rs         # Runtime statistics
+└── subscribe.rs     # Subscription helpers
 ```
 
 ---
@@ -258,7 +249,7 @@ pub trait Handler: Send + Sync {
 
 ### Hook Registration Priority
 
-Handlers can register with a priority. Lower values execute first. The `counter` plugin registers at `Priority::MAX` to ensure it runs last.
+Handlers can register with a priority. Lower values execute first.
 
 ---
 
@@ -277,8 +268,6 @@ sequenceDiagram
     participant Pub as Publishing Client
     participant Broker as OXIMQTT
     participant Sub as Subscribed Client
-    participant Store as Storage Plugin
-    participant Cluster as Cluster Plugin
 
     Pub->>Broker: CONNECT
     Broker->>Broker: Version detect (v3/v5)
@@ -298,18 +287,11 @@ sequenceDiagram
     Broker->>Broker: MessagePublish hook
     Broker->>Broker: Match subscriptions in trie
     
-    par Concurrent Delivery
-        Broker->>Sub: Deliver message
-        Broker->>Sub: MessageDelivered hook
-    and Cluster Forwarding
-        Broker->>Cluster: Forward to cluster nodes
-        Cluster->>Cluster: Raft consensus or broadcast
-        Cluster-->>Broker: Acknowledged
-    end
-    
+    Broker->>Sub: Deliver message
+    Broker->>Broker: MessageDelivered hook
+
     alt Client Offline
-        Broker->>Store: Store offline message
-        Store-->>Broker: Stored
+        Broker->>Broker: Queue offline message
     end
 
     Sub->>Broker: PUBACK (QoS 1) or PUBREC (QoS 2)
@@ -349,7 +331,7 @@ The core broker (`oximqtt`) uses Cargo feature flags to conditionally compile tr
 | `ws` | WebSocket transport | `tokio-tungstenite` |
 | `quic` | QUIC transport | implies `tls` |
 
-All other functionality (delayed publish, retained messages, metrics, stats, shared subscriptions, auto-subscription, etc.) is compiled unconditionally as built-in modules.
+All other functionality (delayed publish, retained messages, metrics, stats, etc.) is compiled unconditionally as built-in modules.
 
 ---
 
@@ -373,7 +355,7 @@ The entire codebase enforces `#![deny(unsafe_code)]`. All concurrency is handled
 
 ### 4. Built-in Module Isolation
 
-Built-in modules are conditionally compiled via Cargo feature flags within the core crate, ensuring zero overhead for unused functionality. Each module (ACL, JWT auth, retainer, sys-topic) is self-contained and configured directly in `oximqtt.toml`.
+Built-in modules are self-contained and configured directly in `oximqtt.toml`. Each module (ACL, JWT auth, retainer, sys-topic) registers its hook handlers during server initialization.
 
 ### 5. Codec Architecture
 

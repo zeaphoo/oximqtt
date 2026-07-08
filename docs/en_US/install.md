@@ -17,13 +17,13 @@ Get the binary package of the corresponding OS from [OXIMQTT Download](https://g
 1. Download the ZIP package from [GitHub Release](https://github.com/zeaphoo/oximqtt/releases).
 
 ```bash
-$ wget "https://github.com/zeaphoo/oximqtt/releases/download/0.21.0/oximqtt-0.21.0-x86_64-unknown-linux-musl.zip"
+$ wget "https://github.com/zeaphoo/oximqtt/releases/download/0.22.0/oximqtt-0.22.0-x86_64-unknown-linux-musl.zip"
 ```
 
 2. Decompress the zip package you downloaded from [GitHub Release](https://github.com/zeaphoo/oximqtt/releases).
 
 ```bash
-$ unzip oximqtt-0.21.0-x86_64-unknown-linux-musl.zip -d /app/
+$ unzip oximqtt-0.22.0-x86_64-unknown-linux-musl.zip -d /app/
 ```
 
 3. Modify the permissions
@@ -52,9 +52,8 @@ tcp        0      0 0.0.0.0:11883           0.0.0.0:*               LISTEN      
 
 #### Install the RUST compilation environment
 
-Operating in Centos7. Skip this process if the compilation environment already exists. attention: Toolchain requires
-1.56 or later versions. If connection errors are reported in 1.59 or later versions, upgrade the system development
-environment.
+Operating in Centos7. Skip this process if the compilation environment already exists. Attention: Toolchain requires
+1.89 or later versions.
 
 1. Install Rustup
 

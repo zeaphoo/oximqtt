@@ -17,13 +17,13 @@ OXIMQTT 目前支持的操作系统:
 1. 从[GitHub Release](https://github.com/zeaphoo/oximqtt/releases) 下载zip包。
 
 ```bash
-$ wget "https://github.com/zeaphoo/oximqtt/releases/download/0.21.0/oximqtt-0.21.0-x86_64-unknown-linux-musl.zip"
+$ wget "https://github.com/zeaphoo/oximqtt/releases/download/0.22.0/oximqtt-0.22.0-x86_64-unknown-linux-musl.zip"
 ```
 
 2. 解压从[GitHub Release](https://github.com/zeaphoo/oximqtt/releases) 下载的zip包。
 
 ```bash
-$ unzip oximqtt-0.21.0-x86_64-unknown-linux-musl.zip -d /app/
+$ unzip oximqtt-0.22.0-x86_64-unknown-linux-musl.zip -d /app/
 ```
 
 3. 修改权限
@@ -52,7 +52,7 @@ tcp        0      0 0.0.0.0:11883           0.0.0.0:*               LISTEN      
 
 #### 安装rust编译环境
 
-以Centos7为例，如果编译环境已经存在跳过此过程。注意：工具链需要1.56及之后版本，1.59及之后版本如果报连接错误需要升级系统开发环境。
+以Centos7为例，如果编译环境已经存在跳过此过程。注意：工具链需要1.89及之后版本。
 
 1. 安装 Rustup
 

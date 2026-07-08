@@ -17,14 +17,14 @@ graph TB
         QUIC[QUIC 客户端]
     end
 
-    subgraph "网络层 (oximqtt-net)"
+    subgraph "网络层 (oximqtt::net)"
         Builder[Builder API<br/>监听器配置]
         Listener[TCP/TLS/WS/WSS/QUIC<br/>监听器]
         Acceptor[Acceptor<br/>单连接处理器]
         Dispatcher[协议分发器<br/>v3/v5 版本协商]
     end
 
-    subgraph "协议层 (oximqtt-codec)"
+    subgraph "协议层 (oximqtt::codec)"
         Codec[MqttCodec<br/>编码器/解码器]
         V3[v3::Codec<br/>MQTT 3.1.1]
         V5[v5::Codec<br/>MQTT 5.0]
@@ -42,22 +42,17 @@ graph TB
         Executor[任务执行器<br/>异步队列]
     end
 
-    subgraph "配置管理 (oximqtt-conf)"
+    subgraph "配置管理 (oximqtt::conf)"
         Settings[Settings<br/>配置单例]
         Options[Options<br/>CLI 解析器]
         ListenerCfg[监听器配置<br/>按协议设置]
     end
 
-    subgraph "存储插件"
-        Retain[Retainer<br/>RAM/Sled/Redis]
-        MsgStore[消息存储<br/>RAM/Redis/Redis Cluster]
-        SessionStore[会话存储<br/>Sled/Redis/Redis Cluster]
-    end
-
-    subgraph "集群插件"
-        Raft[Raft 共识<br/>强一致性]
-        Broadcast[广播<br/>高吞吐]
-        gRPC[gRPC 节点间<br/>通信]
+    subgraph "内置模块"
+        ACL[ACL<br/>访问控制]
+        Retainer[Retainer<br/>保留消息]
+        SysTopic[Sys Topic<br/>$SYS 发布]
+        AuthJWT[JWT 认证<br/>令牌验证]
     end
 
     MQTT & TLS & WS & QUIC --> Listener
@@ -80,9 +75,7 @@ graph TB
     Router --> Queue
     Queue --> Inflight
 
-    Session -.-> Retain & MsgStore & SessionStore
-    Router -.-> Raft & Broadcast
-    Raft & Broadcast -.-> gRPC
+    Session -.-> ACL & Retainer & SysTopic & AuthJWT
 ```
 
 ---
@@ -130,13 +123,12 @@ oximqtt/src/
 ├── acl.rs           # ACL 类型和 trait 定义
 ├── args.rs          # 命令行参数结构体
 ├── shared.rs        # 共享订阅 ($share/)
-├── delayed.rs       # [feature: delayed] 延迟发布
-├── grpc.rs          # [feature: grpc] gRPC 通信
-├── message.rs       # [feature: msgstore] 消息存储
-├── metrics.rs       # [feature: metrics] 指标收集
-├── retain.rs        # [feature: retain] 保留消息
-├── stats.rs         # [feature: stats] 运行时统计
-└── subscribe.rs     # [feature: *-subscription] 订阅辅助
+├── delayed.rs       # 延迟发布
+├── metrics.rs       # 指标收集
+├── builtins/        # 内置模块 (acl, auth_jwt, retainer, sys_topic)
+├── retain.rs        # 保留消息
+├── stats.rs         # 运行时统计
+└── subscribe.rs     # 订阅辅助
 ```
 
 ---
@@ -237,7 +229,7 @@ pub trait Handler: Send + Sync {
 
 ### 钩子注册优先级
 
-处理器可以注册时指定优先级。数值越小越先执行。`counter` 插件以 `Priority::MAX` 注册，确保它在最后执行。
+处理器可以注册时指定优先级。数值越小越先执行。
 
 ---
 
@@ -256,8 +248,6 @@ sequenceDiagram
     participant Pub as 发布客户端
     participant Broker as OXIMQTT
     participant Sub as 订阅客户端
-    participant Store as 存储插件
-    participant Cluster as 集群插件
 
     Pub->>Broker: CONNECT
     Broker->>Broker: 版本检测 (v3/v5)
@@ -277,18 +267,11 @@ sequenceDiagram
     Broker->>Broker: MessagePublish 钩子
     Broker->>Broker: 在 Trie 中匹配订阅
     
-    par 并发投递
-        Broker->>Sub: 投递消息
-        Broker->>Sub: MessageDelivered 钩子
-    and 集群转发
-        Broker->>Cluster: 转发到集群节点
-        Cluster->>Cluster: Raft 共识或广播
-        Cluster-->>Broker: 已确认
-    end
-    
+    Broker->>Sub: 投递消息
+    Broker->>Broker: MessageDelivered 钩子
+
     alt 客户端离线
-        Broker->>Store: 存储离线消息
-        Store-->>Broker: 已存储
+        Broker->>Broker: 队列缓存离线消息
     end
 
     Sub->>Broker: PUBACK (QoS 1) 或 PUBREC (QoS 2)
@@ -328,7 +311,7 @@ flowchart LR
 | `ws` | WebSocket 传输 | `tokio-tungstenite` |
 | `quic` | QUIC 传输 | 隐含 `tls` |
 
-其他所有功能（延迟发布、保留消息、指标统计、共享订阅、自动订阅等）均作为内置模块无条件编译。
+其他所有功能（延迟发布、保留消息、指标统计等）均作为内置模块无条件编译。
 
 ---
 
@@ -352,7 +335,7 @@ flowchart LR
 
 ### 4. 模块隔离
 
-每个内置模块（如 ACL、Retainer、Auth-JWT、Sys-Topic）作为核心 crate 的一部分进行编译，通过 Cargo feature 标志控制是否启用，确保未使用的功能零开销。
+每个内置模块（如 ACL、Retainer、Auth-JWT、Sys-Topic）作为核心 crate 的一部分进行编译，直接在 `oximqtt.toml` 中配置。各模块自包含，在服务器初始化时通过钩子系统注册处理器。
 
 ### 5. 编解码架构
 

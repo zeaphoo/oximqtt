@@ -144,12 +144,12 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 **Types**: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `deps`, `ci`
 
-**Scopes** (examples): `core`, `net`, `codec`, `conf`, `test`, `plugin/acl`, `plugin/raft`, `cli`
+**Scopes** (examples): `core`, `net`, `codec`, `conf`, `test`, `builtins/acl`, `cli`
 
 **Examples**:
 ```
 feat(net): add cert_subject_dn_as_username option for TLS listeners
-fix(http-api): add startup synchronization and improve reload handling
+fix(builtins/retainer): add startup synchronization and improve reload handling
 deps: upgrade tokio from 1.42 to 1.43
 docs(test): update CLI usage examples for oximqtt-test
 ```

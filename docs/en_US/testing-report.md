@@ -33,7 +33,7 @@ cd paho.mqtt.testing/interoperability
 | `test_redelivery_on_reconnect` | ✅ OK | — |
 | `test_dollar_topics` | ✅ OK | — |
 | `test_unsubscribe` | ✅ OK | — |
-| `test_subscribe_failure` | ✅ OK | Requires ACL config: add `["deny", "all", "subscribe", ["test/nosubscribe"]]` at first line of `oximqtt-acl.toml` |
+| `test_subscribe_failure` | ✅ OK | Requires ACL config: add `["deny", "all", "subscribe", ["test/nosubscribe"]]` at first line of ACL rules in `oximqtt.toml` |
 | `test_zero_length_clientid` | ✅ OK | — |
 
 ### MQTT V5.0 — 24/24 Passing
@@ -102,8 +102,8 @@ cargo build -p oximqtt-test --release
 | Memory | DDR3/2333, 128 GB |
 | Disk | 2 TB |
 | Container | Podman v4.4.1 |
-| MQTT Bench | `docker.io/oximqtt/oximqtt-bench:latest` (v0.1.3) |
-| MQTT Broker | `docker.io/oximqtt/oximqtt:latest` (v0.21.0) |
+| MQTT Bench | `docker.io/zeaphoo/oximqtt-bench:latest` (v0.1.3) |
+| MQTT Broker | `docker.io/zeaphoo/oximqtt:latest` (v0.22.0) |
 
 *Note: MQTT Bench and MQTT Broker run on the same host.*
 

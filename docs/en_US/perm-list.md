@@ -82,5 +82,5 @@ Example:
 
 ```
 If none of the ACL rules are matched, they will be ignored, and the subsequent authentication chain will continue. 
-If the `oximqtt-acl.toml` configuration includes the rule `["allow", "all"]`, all ignored authentications will be allowed 
+If the `acl` configuration in `oximqtt.toml` includes the rule `["allow", "all"]`, all ignored authentications will be allowed 
 by default. Conversely, you can configure the rule `["deny", "all"]` to default to rejecting all ignored authentications.

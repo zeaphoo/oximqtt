@@ -15,7 +15,7 @@ oximqtt/src/
 │
 ├── acl.rs          — ACL 类型（ACLConfig、AclCheckFn、AuthInfo）
 ├── args.rs         — CommandArgs 结构体（node_id）
-├── builtins/       — [feature: full] 内置模块（acl、auth_jwt、retainer、sys_topic）
+├── builtins/       — 内置模块（acl、auth_jwt、retainer、sys_topic）
 ├── context.rs      — ServerContext Builder（流畅 API：.node()、.task_exec_workers() 等）
 ├── executor.rs     — 异步任务执行器（封装 rust-box task-exec-queue）
 ├── extend.rs       — 扩展点（10 个 RwLock 保护的插槽）
@@ -51,7 +51,7 @@ oximqtt/src/
 | `ws` | tokio-tungstenite | WebSocket 传输 |
 | `quic` | tls（隐含） | QUIC 传输 |
 
-其他所有功能（延迟发布、保留消息、指标统计、共享订阅、自动订阅等）均作为内置模块无条件编译。
+其他所有功能（延迟发布、保留消息、指标统计等）均作为内置模块无条件编译。
 
 ## 模块
 

@@ -15,7 +15,7 @@ oximqtt/src/
 │
 ├── acl.rs          — Access Control List types (ACLConfig, AclCheckFn, AuthInfo)
 ├── args.rs         — CommandArgs struct (node_id)
-├── builtins/       — [feature: full] Built-in modules (acl, auth_jwt, retainer, sys_topic)
+├── builtins/       — Built-in modules (acl, auth_jwt, retainer, sys_topic)
 ├── context.rs      — ServerContext builder (fluent API: .node(), .task_exec_workers(), etc.)
 ├── executor.rs     — Async task executor (wraps rust-box task-exec-queue)
 ├── extend.rs       — Extension points with RwLock-protected components (10 slots)
@@ -51,7 +51,7 @@ oximqtt/src/
 | `ws` | tokio-tungstenite | WebSocket transport |
 | `quic` | tls (implies) | QUIC transport |
 
-All other functionality (delayed publish, retained messages, metrics, stats, shared subscriptions, auto-subscription, etc.) is compiled unconditionally as built-in modules.
+All other functionality (delayed publish, retained messages, metrics, stats, etc.) is compiled unconditionally as built-in modules.
 
 ## Modules
 

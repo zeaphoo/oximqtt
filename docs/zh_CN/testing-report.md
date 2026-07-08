@@ -102,8 +102,8 @@ cargo build -p oximqtt-test --release
 | 内存 | DDR3/2333, 128 GB |
 | 磁盘 | 2 TB |
 | 容器 | Podman v4.4.1 |
-| 测试工具 | `oximqtt/oximqtt-bench:latest` (v0.1.3) |
-| MQTT Broker | `oximqtt/oximqtt:latest` (v0.21.0) |
+| 测试工具 | `zeaphoo/oximqtt-bench:latest` (v0.1.3) |
+| MQTT Broker | `zeaphoo/oximqtt:latest` (v0.22.0) |
 
 *测试客户端和 Broker 同机部署。*
 

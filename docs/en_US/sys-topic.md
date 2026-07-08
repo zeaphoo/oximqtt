@@ -42,8 +42,7 @@ message_expiry_interval = "5m"
 <div style="font-size:1.3em;">TIP<br></div>
 <font style="color:#435364;font-size:1.1em;">
 
-By default, OXIMQTT only allows MQTT clients from the local machine to subscribe to $SYS topics. Please refer to the [Built-in ACL](../zh_CN/acl.md) for modifying the publish-subscribe ACL rules.
-In OXIMQTT, most of the data within the $SYS topics can be obtained through other less tightly coupled methods. Device online/offline status can be obtained using [Webhooks](../zh_CN/web-hook.md), while node and cluster status can be obtained through the [HTTP API - Statistical Metrics](http-api.md).
+By default, OXIMQTT only allows MQTT clients from the local machine to subscribe to $SYS topics. Please refer to the [Built-in ACL](acl.md) for modifying the publish-subscribe ACL rules.
 </font>
 </div>
 
