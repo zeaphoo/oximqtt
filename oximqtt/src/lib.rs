@@ -14,12 +14,12 @@
 //!  
 //! 2. **Enterprise Features**  
 //!    - TLS/SSL support with certificate validation  
-//!    - Retained message store (`retain` feature)  
+//!    - Retained message store (`retain` module)  
 //!  
 //! 3. **Extensibility**  
 //!    - Plugin configuration management (`plugin` module)  
 //!    - Custom authentication hooks (`acl` module)  
-//!    - Metrics collection pipeline (`metrics` feature)  
+//!    - Metrics collection pipeline (`metrics` module)  
 //!
 //!  
 //! [MQTT Spec Compliance](https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html)  

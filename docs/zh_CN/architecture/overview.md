@@ -338,23 +338,16 @@ flowchart LR
 
 ## Feature 标志
 
-核心 Broker（`oximqtt`）使用 Cargo feature 标志条件编译可选功能：
+核心 Broker（`oximqtt`）使用 Cargo feature 标志条件编译传输层：
 
 | Feature | 启用内容 | 关键依赖 |
 |---------|----------|----------|
-| `default` | 最小构建（无额外功能） | — |
-| `metrics` | 指标收集 | `oximqtt-macros/metrics` |
-| `stats` | 运行时统计 | — |
+| `default` | TLS + WebSocket + QUIC 传输 | — |
 | `tls` | TLS 传输 | `oximqtt-net/tls` |
 | `ws` | WebSocket 传输 | `oximqtt-net/ws` |
 | `quic` | QUIC 传输 | `oximqtt-net/quic` |
-| `delayed` | 延迟发布 | — |
-| `retain` | 保留消息 | — |
-| `msgstore` | 消息存储 | — |
-| `shared-subscription` | `$share/` 组 | — |
-| `auto-subscription` | 自动订阅 | — |
-| `limit-subscription` | 订阅限制 | — |
-| `full` | 以上所有 | — |
+
+其他所有功能（延迟发布、保留消息、指标统计、共享订阅、自动订阅等）均作为内置模块无条件编译。
 
 ---
 

@@ -74,7 +74,7 @@ oximqtt/
 ├── oximqtt.toml              # Server configuration (for testing)
 │
 ├── oximqtt/                  # Core broker library
-│   ├── Cargo.toml          # Features: metrics, stats, grpc, tls, ws, quic...
+│   ├── Cargo.toml          # Features: tls, ws, quic
 │   ├── src/                # Source code (25+ modules)
 │   └── examples/           # Library mode examples (simple, multi, plugin, tls, ws, quic)
 │
@@ -192,23 +192,23 @@ mosquitto_pub -h 127.0.0.1 -p 1883 -t "test/topic" -m "hello"
 
 ## Understanding Feature Flags
 
-The core library (`oximqtt`) has 15 feature flags. For development, the most commonly used combinations are:
+The core library (`oximqtt`) has 4 feature flags for transport layers. All other functionality (delayed publish, retained messages, metrics, stats, shared subscriptions, etc.) is compiled unconditionally.
 
 ```bash
-# Build with specific features
-cargo build -p oximqtt --features "metrics,stats"
+# Build with default features (TLS + WebSocket + QUIC)
+cargo build -p oximqtt
 
-# Full feature set (what oximqttd uses)
-cargo build -p oximqtt --features "full"
+# Build without default features (no transport extras)
+cargo build -p oximqtt --no-default-features
 
-# Test a specific feature combination
-cargo test -p oximqtt --features "metrics,stats"
+# Build with only TLS
+cargo build -p oximqtt --no-default-features --features "tls"
 ```
 
-When adding a new feature:
+When adding a new transport feature:
 1. Add it to `oximqtt/Cargo.toml` `[features]` section
-2. Gate module imports with `#[cfg(feature = "your-feature")]`
-3. Add it to the `full` feature list if it should be included by default in production
+2. Add the corresponding feature gate in `oximqtt-net`
+3. Add it to the `default` feature list if it should be included by default
 4. Update the feature table in documentation
 
 ---

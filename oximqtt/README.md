@@ -34,33 +34,24 @@ oximqtt/src/
 ├── v3.rs           — MQTT v3.1.1 protocol handler
 ├── v5.rs           — MQTT v5.0 protocol handler
 │
-├── delayed.rs      — [feature: delayed] Delayed message publishing
-├── message.rs      — [feature: msgstore] Message storage subsystem
-├── metrics.rs      — [feature: metrics] Metrics collection
-├── retain.rs       — [feature: retain] Retained message storage
-├── stats.rs        — [feature: stats] Runtime statistics
-├── subscribe.rs    — [feature: auto-subscription|shared-subscription] Subscription services
+├── delayed.rs      — Delayed message publishing
+├── message.rs      — Message storage subsystem
+├── metrics.rs      — Metrics collection
+├── retain.rs       — Retained message storage
+├── stats.rs        — Runtime statistics
+├── subscribe.rs    — Subscription services
 ```
 
 ## Feature flags
 
 | Feature | Deps enabled | What it enables |
 |---------|-------------|-----------------|
-| `metrics` | oximqtt-macros/metrics | Metrics collection |
-| `stats` | — | Runtime statistics tracking |
+| `default` | tls, ws, quic | All transport layers |
 | `tls` | oximqtt-net/tls | TLS transport |
 | `ws` | oximqtt-net/ws | WebSocket transport |
 | `quic` | oximqtt-net/quic | QUIC transport |
-| `delayed` | — | Delayed message publishing |
-| `retain` | — | Retained message storage |
-| `msgstore` | — | Message persistence |
-| `shared-subscription` | — | Shared subscriptions ($share/) |
-| `auto-subscription` | — | Auto-subscribe on connect |
-| `limit-subscription` | — | Subscription limiting |
-| `macros` | dep:oximqtt-macros, metrics | Derive macros |
-| `full` | All of the above + builtins | All features |
-| `debug` | — | Debug mode |
-| `default` | (none) | Minimal build |
+
+All other functionality (delayed publish, retained messages, metrics, stats, shared subscriptions, auto-subscription, etc.) is compiled unconditionally as built-in modules.
 
 ## Re-exports
 

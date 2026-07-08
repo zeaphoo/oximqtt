@@ -359,23 +359,16 @@ Plugin configs are no longer loaded separately. All configuration, including bui
 
 ## Feature Flags
 
-The core broker (`oximqtt`) uses Cargo feature flags to conditionally compile optional functionality:
+The core broker (`oximqtt`) uses Cargo feature flags to conditionally compile transport layers:
 
 | Feature | What it enables | Key Dependencies |
 |---------|----------------|------------------|
-| `default` | Minimal build (no extras) | — |
-| `metrics` | Metrics collection | `oximqtt-macros/metrics` |
-| `stats` | Runtime statistics | — |
+| `default` | TLS + WebSocket + QUIC transports | — |
 | `tls` | TLS transport | `oximqtt-net/tls` |
 | `ws` | WebSocket transport | `oximqtt-net/ws` |
 | `quic` | QUIC transport | `oximqtt-net/quic` |
-| `delayed` | Delayed publish | — |
-| `retain` | Retained messages | — |
-| `msgstore` | Message storage | — |
-| `shared-subscription` | `$share/` groups | — |
-| `auto-subscription` | Auto-subscribe on connect | — |
-| `limit-subscription` | Subscription limits | — |
-| `full` | All above | — |
+
+All other functionality (delayed publish, retained messages, metrics, stats, shared subscriptions, auto-subscription, etc.) is compiled unconditionally as built-in modules.
 
 ---
 

@@ -97,14 +97,17 @@ mosquitto_pub -h 127.0.0.1 -p 1883 -t "test/topic" -m "hello"
 
 ## 使用 Feature 标志
 
-核心库（`oximqtt`）有 15 个 feature 标志：
+核心库（`oximqtt`）有 4 个传输层 feature 标志。其他所有功能（延迟发布、保留消息、指标统计、共享订阅等）均无条件编译：
 
 ```bash
-# 最小构建
+# 默认构建（包含 TLS + WebSocket + QUIC）
 cargo build -p oximqtt
 
-# 完整功能（oximqttd 使用的）
-cargo build -p oximqtt --features "full"
+# 不含默认功能
+cargo build -p oximqtt --no-default-features
+
+# 仅启用 TLS
+cargo build -p oximqtt --no-default-features --features "tls"
 ```
 
 ---

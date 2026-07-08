@@ -34,33 +34,24 @@ oximqtt/src/
 ├── v3.rs           — MQTT v3.1.1 协议处理器
 ├── v5.rs           — MQTT v5.0 协议处理器
 │
-├── delayed.rs      — [feature: delayed] 延迟消息发布
-├── message.rs      — [feature: msgstore] 消息存储子系统
-├── metrics.rs      — [feature: metrics] 指标收集
-├── retain.rs       — [feature: retain] 保留消息存储
-├── stats.rs        — [feature: stats] 运行时统计
-├── subscribe.rs    — [feature: auto-subscription|shared-subscription] 订阅服务
+├── delayed.rs      — 延迟消息发布
+├── message.rs      — 消息存储子系统
+├── metrics.rs      — 指标收集
+├── retain.rs       — 保留消息存储
+├── stats.rs        — 运行时统计
+├── subscribe.rs    — 订阅服务
 ```
 
 ## Feature 标志
 
 | Feature | 启用的依赖 | 说明 |
 |---------|-------------|------|
-| `metrics` | oximqtt-macros/metrics | 指标收集 |
-| `stats` | — | 运行时统计追踪 |
+| `default` | tls, ws, quic | 所有传输层 |
 | `tls` | oximqtt-net/tls | TLS 传输 |
 | `ws` | oximqtt-net/ws | WebSocket 传输 |
 | `quic` | oximqtt-net/quic | QUIC 传输 |
-| `delayed` | — | 延迟消息发布 |
-| `retain` | — | 保留消息存储 |
-| `msgstore` | — | 消息持久化 |
-| `shared-subscription` | — | 共享订阅（$share/） |
-| `auto-subscription` | — | 连接时自动订阅 |
-| `limit-subscription` | — | 订阅限制 |
-| `macros` | dep:oximqtt-macros, metrics | 派生宏 |
-| `full` | 以上全部 + 内置模块 | 所有功能 |
-| `debug` | — | 调试模式 |
-| `default` | （无） | 最小构建 |
+
+其他所有功能（延迟发布、保留消息、指标统计、共享订阅、自动订阅等）均作为内置模块无条件编译。
 
 ## 重新导出
 
