@@ -1,13 +1,18 @@
 #!/bin/bash
 
-cargo publish --registry crates-io --all-features --manifest-path oximqtt/Cargo.toml
+set -e
 
-sleep 15
+publish() {
+    echo ">>> Publishing $1 ..."
+    cargo publish --all-features --manifest-path "$1/Cargo.toml"
+    echo ">>> $1 published, waiting for index update..."
+    sleep 15
+}
 
-cargo publish --registry crates-io --all-features --manifest-path oximqtt-bin/Cargo.toml
+# oximqtt (contains codec, net, utils, conf)
+publish oximqtt
 
-# cargo publish --registry crates-io --all-features --manifest-path oximqtt-macros/Cargo.toml
-# cargo publish --registry crates-io --all-features --manifest-path oximqtt-utils/Cargo.toml
-# cargo publish --registry crates-io --all-features --manifest-path oximqtt-codec/Cargo.toml
-# cargo publish --registry crates-io --all-features --manifest-path oximqtt-net/Cargo.toml
-# cargo publish --registry crates-io --all-features --manifest-path oximqtt-conf/Cargo.toml
+# oximqtt-bin -> oximqtt
+publish oximqtt-bin
+
+echo ">>> All crates published."

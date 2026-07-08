@@ -4,7 +4,7 @@ use std::time::Instant;
 
 use crate::framework::context::TestContext;
 use crate::framework::testcase::{TestCase, TestResult};
-use oximqtt_codec::v5::ConnectAckReason;
+use oximqtt::codec::v5::ConnectAckReason;
 
 /// Test basic MQTT 5.0 connect with session expiry
 pub struct ConnectV5Test;

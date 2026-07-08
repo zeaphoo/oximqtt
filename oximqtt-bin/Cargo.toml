@@ -21,8 +21,6 @@ tikv-jemallocator = "0.6"
 [dependencies]
 tokio = { workspace = true, features = ["macros", "rt-multi-thread", "signal"] }
 oximqtt.workspace = true
-oximqtt-conf.workspace = true
-oximqtt-net.workspace = true
 clap.workspace = true
 log.workspace = true
 tracing.workspace = true

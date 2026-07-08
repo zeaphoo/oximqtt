@@ -33,7 +33,7 @@ use anyhow::anyhow;
 use anyhow::Result;
 use bytes::Bytes;
 use bytestring::ByteString;
-use oximqtt_codec::v3::{
+use oximqtt::codec::v3::{
     Connect, ConnectAck, ConnectAckReason, LastWill, Packet as PacketV3, SubscribeReturnCode,
 };
 use tokio::sync::{mpsc, oneshot, Mutex};
@@ -107,7 +107,7 @@ impl MqttV311Client {
         //
         {
             let conn = Connect {
-                protocol: oximqtt_codec::types::Protocol(MQTT_LEVEL_311),
+                protocol: oximqtt::codec::types::Protocol(MQTT_LEVEL_311),
                 clean_session,
                 keep_alive,
                 last_will: will,
@@ -268,7 +268,7 @@ impl MqttV311Client {
             None
         };
 
-        let publish = oximqtt_codec::types::Publish {
+        let publish = oximqtt::codec::types::Publish {
             dup: false,
             retain,
             qos,

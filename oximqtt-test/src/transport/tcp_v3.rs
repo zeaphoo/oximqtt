@@ -8,8 +8,8 @@
 use std::time::Duration;
 
 use bytes::{Bytes, BytesMut};
-use oximqtt_codec::v3::Codec as V3Codec;
-use oximqtt_codec::v3::Packet as PacketV3;
+use oximqtt::codec::v3::Codec as V3Codec;
+use oximqtt::codec::v3::Packet as PacketV3;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::tcp::{OwnedReadHalf, OwnedWriteHalf};
 use tokio::net::TcpStream;
@@ -145,7 +145,7 @@ impl TcpTransportV3Writer {
 
 /// Get a human-readable name for a packet type
 pub(crate) fn packet_name_v3(packet: &PacketV3) -> &'static str {
-    use oximqtt_codec::v3::Packet;
+    use oximqtt::codec::v3::Packet;
     match packet {
         Packet::Connect(_) => "CONNECT",
         Packet::ConnectAck { .. } => "CONNACK",

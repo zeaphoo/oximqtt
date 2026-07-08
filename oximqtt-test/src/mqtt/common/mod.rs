@@ -4,9 +4,9 @@ pub mod error;
 pub mod session;
 
 // Re-export commonly used types from oximqtt_codec
-pub use oximqtt_codec::v3::Connect as ConnectPacketInner;
-pub use oximqtt_codec::v3::Packet as PacketV3;
-pub use oximqtt_codec::v3::QoS;
+pub use oximqtt::codec::v3::Connect as ConnectPacketInner;
+pub use oximqtt::codec::v3::Packet as PacketV3;
+pub use oximqtt::codec::v3::QoS;
 
 // Main Packet type for v3
 pub type Packet = PacketV3;

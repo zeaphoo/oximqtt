@@ -15,7 +15,7 @@ name = "mqtt_harness"
 path = "src/main.rs"
 
 [dependencies]
-oximqtt-codec.workspace = true
+oximqtt.workspace = true
 tokio = { workspace = true, features = ["full"] }
 tokio-util = { workspace = true, features = ["codec"] }
 bytes = { workspace = true, features = ["serde"] }

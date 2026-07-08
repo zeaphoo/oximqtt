@@ -5,7 +5,7 @@ use std::time::{Duration, Instant};
 use crate::framework::context::TestContext;
 use crate::framework::testcase::{TestCase, TestResult};
 use crate::mqtt::common::QoS;
-use oximqtt_codec::v5::RetainHandling;
+use oximqtt::codec::v5::RetainHandling;
 
 /// Test RetainHandling::NoAtSubscribe (value 2) - no retained messages on subscribe (v5)
 pub struct RetainHandlingNoAtSubscribeV5Test;

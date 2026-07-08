@@ -31,7 +31,7 @@ use anyhow::anyhow;
 use anyhow::Result;
 use bytes::Bytes;
 use bytestring::ByteString;
-use oximqtt_codec::v3::{Connect, ConnectAck, ConnectAckReason, Packet as PacketV3, QoS, SubscribeReturnCode};
+use oximqtt::codec::v3::{Connect, ConnectAck, ConnectAckReason, Packet as PacketV3, QoS, SubscribeReturnCode};
 use tokio::sync::{mpsc, oneshot, Mutex};
 use tokio::time;
 
@@ -86,7 +86,7 @@ impl MqttV3Client {
         //
         {
             let conn = Connect {
-                protocol: oximqtt_codec::types::Protocol(3),
+                protocol: oximqtt::codec::types::Protocol(3),
                 clean_session: true,
                 keep_alive: 60,
                 last_will: None,
@@ -201,7 +201,7 @@ impl MqttV3Client {
 
     /// Publish QoS0
     pub async fn publish(&self, topic: &str, payload: &[u8]) -> Result<()> {
-        let publish = oximqtt_codec::types::Publish {
+        let publish = oximqtt::codec::types::Publish {
             dup: false,
             retain: false,
             qos: QoS::AtMostOnce,

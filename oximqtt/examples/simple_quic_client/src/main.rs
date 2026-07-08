@@ -22,12 +22,12 @@ pub use rustls::crypto::aws_lc_rs as tls_provider;
 #[cfg(target_os = "windows")]
 pub use rustls::crypto::ring as tls_provider;
 
-use oximqtt_codec::{
+use oximqtt::codec::{
     types::{Protocol, Publish, QoS},
     v3::{Codec as CodecV3, Connect},
     MqttCodec, MqttPacket,
 };
-use oximqtt_net::{QuinnBiStream, Result};
+use oximqtt::net::{QuinnBiStream, Result};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -61,12 +61,12 @@ async fn main() -> Result<()> {
         password: None,
         cert: None,
     };
-    framed.send(MqttPacket::V3(oximqtt_codec::v3::Packet::Connect(Box::new(connect)))).await?;
+    framed.send(MqttPacket::V3(oximqtt::codec::v3::Packet::Connect(Box::new(connect)))).await?;
     framed.flush().await?;
     log::info!("Sent CONNECT");
 
     // Wait for CONNACK response
-    if let Some(Ok((MqttPacket::V3(oximqtt_codec::v3::Packet::ConnectAck(ack)), _))) = framed.next().await {
+    if let Some(Ok((MqttPacket::V3(oximqtt::codec::v3::Packet::ConnectAck(ack)), _))) = framed.next().await {
         log::info!("Received CONNACK: {ack:?}");
     }
 
@@ -80,12 +80,12 @@ async fn main() -> Result<()> {
         payload: Bytes::from_static(b"data ..."),
         properties: None,
     };
-    framed.send(MqttPacket::V3(oximqtt_codec::v3::Packet::Publish(Box::new(publish)))).await?;
+    framed.send(MqttPacket::V3(oximqtt::codec::v3::Packet::Publish(Box::new(publish)))).await?;
     framed.flush().await?;
     log::info!("Sent PUBLISH");
 
     // Wait for PUBACK response
-    if let Some(Ok((MqttPacket::V3(oximqtt_codec::v3::Packet::PublishAck { packet_id }), _))) =
+    if let Some(Ok((MqttPacket::V3(oximqtt::codec::v3::Packet::PublishAck { packet_id }), _))) =
         framed.next().await
     {
         log::info!("Received PUBACK for packet_id {packet_id:?}");

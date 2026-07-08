@@ -8,7 +8,7 @@
 //!  
 //! 1. **Protocol Engine**  
 //!    - Dual-stack MQTT v3/v5 support via `v3`/`v5` modules  
-//!    - Zero-copy codec implementation from `oximqtt_codec`  
+//!    - Zero-copy codec implementation from `oximqtt::codec`  
 //!    - QoS 0/1/2 message handling with `inflight` tracking  
 //!
 //!  
@@ -89,10 +89,10 @@ pub mod v5; // MQTT v5.0 implementation
 /// External Crate Re-exports
 pub use net::{Error, Result};
 /// MQTT protocol codec
-pub use oximqtt_codec as codec;
-/// Macro utilities
-pub use oximqtt_macros as macros;
+pub mod codec;
 /// Network abstractions (TCP, TLS, WebSocket, QUIC)
-pub use oximqtt_net as net;
+pub mod net;
 /// Common utility functions and types
-pub use oximqtt_utils as utils;
+pub mod utils;
+/// Configuration management
+pub mod conf;

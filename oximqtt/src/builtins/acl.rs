@@ -457,7 +457,7 @@ const CACHE_KEY: &str = "$SYS/ACL-CACHE-MAP";
 
 pub async fn init(scx: &ServerContext) -> Result<()> {
     let cfg = {
-        let val = oximqtt_conf::Settings::instance().acl.clone();
+        let val = crate::conf::Settings::instance().acl.clone();
         let val = if val.is_null() { serde_json::json!({}) } else { val };
         serde_json::from_value::<PluginConfig>(val)?
     };

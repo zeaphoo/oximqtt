@@ -18,18 +18,14 @@ all-features = true
 
 [features]
 default = ["tls", "ws", "quic"]
-tls = ["oximqtt-net/tls"]
-ws = ["oximqtt-net/ws"]
-quic = ["oximqtt-net/quic"]
+tls = ["dep:rustls", "dep:tokio-rustls", "dep:x509-parser"]
+ws = ["dep:tokio-tungstenite"]
+quic = ["tls"]
 
 [dependencies]
-oximqtt-net.workspace = true
-oximqtt-codec.workspace = true
-oximqtt-conf.workspace = true
-oximqtt-macros.workspace = true
-oximqtt-utils.workspace = true
 rust-box = { workspace = true, features = ["dequemap", "task-exec-queue", "task-exec-queue-rate"] }
-tokio = { workspace = true, features = ["macros", "rt-multi-thread", "io-util"] }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread", "io-util", "net", "time"] }
+tokio-util = { workspace = true, features = ["codec"] }
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
 futures.workspace = true
@@ -53,7 +49,7 @@ systemstat.workspace = true
 postcard.workspace = true
 prost.workspace = true
 rand.workspace = true
-prometheus.workspace = true
+paste.workspace = true
 url.workspace = true
 config = { workspace = true, features = ["toml"] }
 scopeguard.workspace = true
@@ -62,6 +58,24 @@ strum = { workspace = true, features = ["derive"] }
 jsonwebtoken.workspace = true
 itoa.workspace = true
 toml.workspace = true
+regex.workspace = true
+clap.workspace = true
+once_cell.workspace = true
+nonzero_ext.workspace = true
+socket2 = { workspace = true, features = ["all"] }
+proxy-protocol.workspace = true
+quinn.workspace = true
+tokio-tungstenite = { workspace = true, optional = true }
+tokio-rustls = { workspace = true, optional = true }
+rustls = { workspace = true, features = ["ring", "logging", "std", "tls12"], optional = true }
+
+[dependencies.x509-parser]
+version = "0.18.0"
+optional = true
+
+[dev-dependencies]
+test-case = "3.2"
+simple_logger.workspace = true
 
 [build-dependencies]
 chrono = { workspace = true, features = ["clock"] }

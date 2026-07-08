@@ -3,22 +3,12 @@ resolver = "2"
 members = [
     "oximqtt",
     "oximqtt-bin",
-    "oximqtt-macros",
-    "oximqtt-codec",
-    "oximqtt-net",
-    "oximqtt-conf",
-    "oximqtt-utils",
     "oximqtt-test",
     "oximqtt/examples/*",
 ]
 
 [patch.crates-io]
 oximqtt = { path = "oximqtt" }
-oximqtt-codec = { path = "oximqtt-codec" }
-oximqtt-net = { path = "oximqtt-net" }
-oximqtt-conf = { path = "oximqtt-conf" }
-oximqtt-macros = { path = "oximqtt-macros" }
-oximqtt-utils = { path = "oximqtt-utils" }
 
 
 [workspace.package]
@@ -36,11 +26,6 @@ rust-version = "1.89.0"
 
 [workspace.dependencies]
 oximqtt = "0.22.0"
-oximqtt-codec = "0.2.2"
-oximqtt-net = "0.3.5"
-oximqtt-conf = "0.3.5"
-oximqtt-macros = "0.1.2"
-oximqtt-utils = "0.1.6"
 
 tokio = { version = "1",  default-features = false }
 futures = "0.3"
@@ -80,7 +65,7 @@ bitflags = "2.9.2"
 leaky-bucket = "1.1.2"
 scc = "2.3.4"
 get-size2 = "0.9"
-prometheus = "0.14"
+paste = "1.0"
 futures-time = "3.0"
 nonzero_ext = "0.3"
 itoa = "1.0.15"

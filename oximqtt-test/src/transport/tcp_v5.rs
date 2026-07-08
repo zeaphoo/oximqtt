@@ -8,8 +8,8 @@
 use std::time::Duration;
 
 use bytes::{Bytes, BytesMut};
-use oximqtt_codec::v5::Codec as V5Codec;
-use oximqtt_codec::v5::Packet as PacketV5;
+use oximqtt::codec::v5::Codec as V5Codec;
+use oximqtt::codec::v5::Packet as PacketV5;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::tcp::{OwnedReadHalf, OwnedWriteHalf};
 use tokio::net::TcpStream;
@@ -145,7 +145,7 @@ impl TcpTransportV5Writer {
 
 /// Get a human-readable name for a packet type
 pub(crate) fn packet_name_v5(packet: &PacketV5) -> &'static str {
-    use oximqtt_codec::v5::Packet;
+    use oximqtt::codec::v5::Packet;
     match packet {
         Packet::Connect(_) => "CONNECT",
         Packet::ConnectAck(_) => "CONNACK",

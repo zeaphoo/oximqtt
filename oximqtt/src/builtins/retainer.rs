@@ -125,7 +125,7 @@ impl RetainStorage for RamRetainer {
 
 pub async fn init(scx: &crate::context::ServerContext) -> Result<()> {
     let cfg = {
-        let val = oximqtt_conf::Settings::instance().retainer.clone();
+        let val = crate::conf::Settings::instance().retainer.clone();
         let val = if val.is_null() { serde_json::json!({}) } else { val };
         serde_json::from_value::<PluginConfig>(val)?
     };

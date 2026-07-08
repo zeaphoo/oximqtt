@@ -150,7 +150,7 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 ```
 feat(net): add cert_subject_dn_as_username option for TLS listeners
 fix(http-api): add startup synchronization and improve reload handling
-deps: upgrade prometheus from 0.13 to 0.14
+deps: upgrade tokio from 1.42 to 1.43
 docs(test): update CLI usage examples for oximqtt-test
 ```
 

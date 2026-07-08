@@ -6,7 +6,7 @@ use crate::framework::context::TestContext;
 use crate::framework::testcase::{TestCase, TestResult};
 use crate::mqtt::common::QoS;
 use bytestring::ByteString;
-use oximqtt_codec::v3::LastWill;
+use oximqtt::codec::v3::LastWill;
 
 /// Test that Last Will fires when client disconnects unexpectedly (v3.1.1)
 pub struct LastWillV311Test;
@@ -172,7 +172,7 @@ impl TestCase for LastWillV5Test {
             sub.subscribe(will_topic, QoS::AtLeastOnce).await?;
             tokio::time::sleep(Duration::from_millis(100)).await;
 
-            let will = oximqtt_codec::v5::LastWill {
+            let will = oximqtt::codec::v5::LastWill {
                 qos: QoS::AtLeastOnce,
                 retain: false,
                 topic: ByteString::from(will_topic),

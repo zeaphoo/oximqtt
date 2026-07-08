@@ -34,8 +34,8 @@ use anyhow::anyhow;
 use anyhow::Result;
 use bytes::Bytes;
 use bytestring::ByteString;
-use oximqtt_codec::v5::ConnectAckReason;
-use oximqtt_codec::v5::{
+use oximqtt::codec::v5::ConnectAckReason;
+use oximqtt::codec::v5::{
     Connect, ConnectAck, LastWill, Packet as PacketV5, PublishAck, PublishAck2, PublishAck2Reason,
     PublishAckReason, PublishProperties, SubscriptionOptions, UserProperties,
 };
@@ -66,7 +66,7 @@ pub struct IncomingMessage {
 #[derive(Debug)]
 pub struct SubscribeAck {
     pub packet_id: NonZeroU16,
-    pub status: Vec<oximqtt_codec::v5::SubscribeAckReason>,
+    pub status: Vec<oximqtt::codec::v5::SubscribeAckReason>,
 }
 
 /// MQTT v5.0 Client - enhanced with properties
@@ -349,7 +349,7 @@ impl MqttV5Client {
             None
         };
 
-        let publish = oximqtt_codec::types::Publish {
+        let publish = oximqtt::codec::types::Publish {
             dup: false,
             retain,
             qos,
@@ -405,7 +405,7 @@ impl MqttV5Client {
             subscription_ids: Vec::new(),
         };
 
-        let publish = oximqtt_codec::types::Publish {
+        let publish = oximqtt::codec::types::Publish {
             dup: false,
             retain,
             qos,
@@ -422,7 +422,7 @@ impl MqttV5Client {
 
     /// Subscribe to a topic with a specific QoS
     pub async fn subscribe(&mut self, topic: &str, qos: QoSTest) -> Result<SubscribeAck> {
-        self.subscribe_with_options(topic, qos, false, false, oximqtt_codec::v5::RetainHandling::AtSubscribe)
+        self.subscribe_with_options(topic, qos, false, false, oximqtt::codec::v5::RetainHandling::AtSubscribe)
             .await
     }
 
@@ -433,12 +433,12 @@ impl MqttV5Client {
         qos: QoSTest,
         no_local: bool,
         retain_as_published: bool,
-        retain_handling: oximqtt_codec::v5::RetainHandling,
+        retain_handling: oximqtt::codec::v5::RetainHandling,
     ) -> Result<SubscribeAck> {
         let packet_id = NonZeroU16::new(u16::from(self.packet_id_counter.next()))
             .ok_or_else(|| anyhow!("packet id overflow"))?;
 
-        let subscribe_pkt = PacketV5::Subscribe(oximqtt_codec::v5::Subscribe {
+        let subscribe_pkt = PacketV5::Subscribe(oximqtt::codec::v5::Subscribe {
             packet_id,
             id: None,
             user_properties: Vec::new(),
@@ -469,7 +469,7 @@ impl MqttV5Client {
         let packet_id = NonZeroU16::new(u16::from(self.packet_id_counter.next()))
             .ok_or_else(|| anyhow!("packet id overflow"))?;
 
-        let unsub = PacketV5::Unsubscribe(oximqtt_codec::v5::Unsubscribe {
+        let unsub = PacketV5::Unsubscribe(oximqtt::codec::v5::Unsubscribe {
             packet_id,
             topic_filters: vec![ByteString::from(topic)],
             user_properties: Vec::new(),
@@ -495,10 +495,10 @@ impl MqttV5Client {
         self.connected.store(false, Ordering::Relaxed);
 
         let code = reason_code
-            .and_then(|c| oximqtt_codec::v5::DisconnectReasonCode::try_from(c).ok())
-            .unwrap_or(oximqtt_codec::v5::DisconnectReasonCode::NormalDisconnection);
+            .and_then(|c| oximqtt::codec::v5::DisconnectReasonCode::try_from(c).ok())
+            .unwrap_or(oximqtt::codec::v5::DisconnectReasonCode::NormalDisconnection);
 
-        let disc = oximqtt_codec::v5::Disconnect {
+        let disc = oximqtt::codec::v5::Disconnect {
             reason_code: code,
             session_expiry_interval_secs: None,
             server_reference: None,

@@ -11,8 +11,8 @@ use time::{format_description::FormatItem, macros::format_description, OffsetDat
 use tracing_appender::non_blocking::{self, WorkerGuard};
 use tracing_subscriber::{fmt, fmt::time::FormatTime, layer::SubscriberExt, prelude::*, EnvFilter};
 
-use oximqtt_conf::logging::{Log, To};
-use oximqtt_net::Result;
+use oximqtt::conf::logging::{Log, To};
+use oximqtt::Result;
 
 /// Prevent log loss on process exit.
 static LOG_GUARD: OnceLock<WorkerGuard> = OnceLock::new();

@@ -316,7 +316,7 @@ fn parse(name: &str, val: &serde_json::Value) -> (ValidateExpEnable, ValidateNbf
 
 pub async fn init(scx: &ServerContext) -> Result<()> {
     let mut cfg = {
-        let val = oximqtt_conf::Settings::instance().auth_jwt.clone();
+        let val = crate::conf::Settings::instance().auth_jwt.clone();
         let val = if val.is_null() { serde_json::json!({}) } else { val };
         serde_json::from_value::<PluginConfig>(val)?
     };

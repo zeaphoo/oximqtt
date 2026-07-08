@@ -48,7 +48,7 @@
 use std::sync::Arc;
 
 use anyhow::anyhow;
-use oximqtt_codec::MqttCodec;
+use crate::codec::MqttCodec;
 use rust_box::task_exec_queue::SpawnExt;
 use scopeguard::defer;
 use tokio::io::{AsyncRead, AsyncWrite};

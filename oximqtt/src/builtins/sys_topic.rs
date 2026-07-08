@@ -95,7 +95,7 @@ impl PluginConfig {
 
 pub async fn init(scx: &ServerContext) -> Result<()> {
     let cfg = {
-        let val = oximqtt_conf::Settings::instance().sys_topic.clone();
+        let val = crate::conf::Settings::instance().sys_topic.clone();
         let val = if val.is_null() { serde_json::json!({}) } else { val };
         serde_json::from_value::<PluginConfig>(val)?
     };

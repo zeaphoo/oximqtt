@@ -33,7 +33,7 @@ impl TestCase for WillDelayV5Test {
             tokio::time::sleep(Duration::from_millis(100)).await;
 
             // Connect V5 client with will + will_delay_interval of 3 seconds
-            let will = oximqtt_codec::v5::LastWill {
+            let will = oximqtt::codec::v5::LastWill {
                 qos: QoS::AtLeastOnce,
                 retain: false,
                 topic: ByteString::from(will_topic),

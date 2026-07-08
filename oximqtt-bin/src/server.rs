@@ -16,7 +16,7 @@ use oximqtt::net::{tls_provider, Builder};
 use oximqtt::node::Node;
 use oximqtt::server::MqttServer;
 use oximqtt::Result;
-use oximqtt_conf::{listener::Listener, Options, Settings};
+use oximqtt::conf::{listener::Listener, Options, Settings};
 
 mod logger;
 

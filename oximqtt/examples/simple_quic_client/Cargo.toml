@@ -4,8 +4,7 @@ version = "0.1.0"
 edition.workspace = true
 
 [dependencies]
-oximqtt-net = { workspace = true, features = ["quic"] }
-oximqtt-codec.workspace = true
+oximqtt = { workspace = true, features = ["quic"] }
 tokio = { workspace = true, features = ["full"] }
 tokio-util = { workspace = true, features = ["codec"] }
 simple_logger = { workspace = true }

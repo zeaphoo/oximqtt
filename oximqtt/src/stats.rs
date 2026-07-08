@@ -45,7 +45,7 @@
 //! The implementation leverages Rust's type system to ensure:
 //! - Memory safety through ownership model
 //! - Linear scalability with cluster size
-//! - Seamless integration with Prometheus/Grafana
+//! - JSON serialization for external monitoring systems
 //!
 
 use serde::{Deserialize, Serialize};
