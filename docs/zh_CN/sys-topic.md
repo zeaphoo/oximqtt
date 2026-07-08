@@ -14,7 +14,7 @@ $SYS/brokers/1/metrics
 #### 内置模块：
 
 ```bash
-oximqtt-sys-topic
+sys_topic
 ```
 
 #### 配置位置：

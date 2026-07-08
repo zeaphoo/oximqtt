@@ -43,7 +43,6 @@ cargo build
 cargo build --release
 
 # Build a specific sub-crate
-cargo build -p oximqtt-codec
 cargo build -p oximqttd
 
 # Build with all features
@@ -57,9 +56,6 @@ The production binary is at `target/release/oximqttd` (or `oximqttd.exe` on Wind
 First build compiles all dependencies and can take 10-30 minutes. Subsequent builds are incremental:
 
 ```bash
-# Use a specific crate for faster iteration during development
-cargo build -p oximqtt-codec
-
 # Build only the core library (skip binary)
 cargo build -p oximqtt
 ```
@@ -75,46 +71,19 @@ oximqtt/
 │
 ├── oximqtt/                  # Core broker library
 │   ├── Cargo.toml          # Features: tls, ws, quic
-│   ├── src/                # Source code (25+ modules)
+│   ├── src/
+│   │   ├── codec/          # MQTT protocol codec (v3/v5)
+│   │   ├── net/            # Network layer (TCP/TLS/WS/QUIC)
+│   │   ├── utils/          # Shared utilities
+│   │   ├── conf/           # Configuration management
+│   │   ├── builtins/       # Built-in modules (acl, auth_jwt, retainer, sys_topic)
+│   │   └── ...             # 25+ broker modules
 │   └── examples/           # Library mode examples (simple, multi, plugin, tls, ws, quic)
 │
 ├── oximqtt-bin/              # Binary entry point
 │   └── src/
-│       ├── server.rs       # Main entry: CLI → config → plugins → start
-│       ├── logger.rs       # Tracing-based logger setup
-│       └── build.rs        # Plugin registration codegen
-│
-├── oximqtt-codec/            # MQTT protocol codec
-│   └── src/
-│       ├── v3/             # MQTT v3.1.1
-│       ├── v5/             # MQTT v5.0
-│       ├── version/        # Version negotiation
-│       ├── error.rs        # Error types
-│       └── types.rs        # Shared protocol types
-│
-├── oximqtt-net/              # Network layer
-│   └── src/
-│       ├── builder.rs      # Builder + Listener + Acceptor
-│       ├── stream.rs       # MQTT stream (v3/v5)
-│       ├── ws.rs           # WebSocket support
-│       ├── quic.rs         # QUIC support
-│       └── error.rs        # MqttError
-│
-├── oximqtt-conf/             # Configuration management
-│   └── src/
-│       ├── listener.rs     # Listener configuration
-│       ├── logging.rs      # Logging configuration
-│       └── options.rs      # CLI argument parsing
-│
-├── oximqtt-utils/            # Shared utilities
-│   └── src/
-│       ├── counter.rs      # Atomic counter with merge
-│       └── lib.rs          # Bytesize, NodeAddr, timers, serde helpers
-│
-├── oximqtt-macros/           # Procedural macros (Metrics, Plugin)
-│   └── src/
-│       ├── metrics.rs      # #[derive(Metrics)] — atomic counter generation
-│       └── plugin.rs       # #[derive(Plugin)] — PackageInfo trait
+│       ├── server.rs       # Main entry: CLI → config → builtins → start
+│       └── logger.rs       # Tracing-based logger setup
 │
 ├── oximqtt-test/             # Test harness
 │   └── src/
@@ -126,13 +95,10 @@ oximqtt/
 │       └── report/         # Output reports (console, JSON, HTML)
 │
 ├── docs/                   # Documentation
-│   ├── en_US/              # English docs (28 files)
-│   └── zh_CN/              # Chinese docs (28 files)
+│   ├── en_US/              # English docs
+│   └── zh_CN/              # Chinese docs
 │
-├── Dockerfile              # Docker build (x86_64)
-├── Dockerfile.amd64        # Docker build (AMD64)
-├── Dockerfile.aarch64      # Docker build (ARM64)
-└── Makefile                # Docker build automation
+└── Dockerfile              # Docker build
 ```
 
 ---
@@ -145,7 +111,7 @@ oximqtt/
 # Edit code, then:
 cargo check              # Fast validation (no binary generation)
 cargo build -p oximqtt     # Build specific crate
-cargo test -p oximqtt-codec # Run unit tests for a crate
+cargo test -p oximqtt      # Run unit tests
 ```
 
 ### 2. Linting
@@ -207,7 +173,7 @@ cargo build -p oximqtt --no-default-features --features "tls"
 
 When adding a new transport feature:
 1. Add it to `oximqtt/Cargo.toml` `[features]` section
-2. Add the corresponding feature gate in `oximqtt-net`
+2. Add the corresponding feature gate in `oximqtt/src/net/`
 3. Add it to the `default` feature list if it should be included by default
 4. Update the feature table in documentation
 

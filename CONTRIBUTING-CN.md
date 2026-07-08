@@ -162,8 +162,8 @@ docs(test): update CLI usage examples for oximqtt-test
 # 运行所有单元测试
 cargo test
 
-# 运行特定 crate 的测试
-cargo test -p oximqtt-codec
+# 运行特定模块的测试
+cargo test -p oximqtt -- codec
 
 # 使用测试框架运行集成测试（需要 release 构建）
 cargo build -p oximqttd --release
@@ -205,7 +205,6 @@ python client_test5.py
 cargo build --release
 
 # 运行基准测试配置
-# 详见 docs/zh_CN/benchmark-testing.md
 ```
 
 ## 文档

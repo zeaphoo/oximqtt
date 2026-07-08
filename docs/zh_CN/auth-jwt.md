@@ -23,7 +23,7 @@ JWT 进行用户认证。
 #### 内置模块：
 
 ```bash
-oximqtt-auth-jwt
+auth_jwt
 ```
 
 #### 配置位置：

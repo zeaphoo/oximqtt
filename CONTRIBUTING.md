@@ -162,8 +162,8 @@ docs(test): update CLI usage examples for oximqtt-test
 # Run all unit tests
 cargo test
 
-# Run tests for a specific crate
-cargo test -p oximqtt-codec
+# Run tests for a specific module
+cargo test -p oximqtt -- codec
 
 # Run integration tests using the test harness (requires release build)
 cargo build -p oximqttd --release
@@ -205,7 +205,6 @@ python client_test5.py
 cargo build --release
 
 # Run with benchmark configuration
-# See docs/en_US/benchmark-testing.md for detailed instructions
 ```
 
 ## Documentation

@@ -91,32 +91,13 @@ graph TB
 
 The workspace is organized into these layers:
 
-### Layer 1: Foundation Crates
-
-These crates have no dependency on other workspace crates:
+### Core Library
 
 | Crate | Path | Responsibility |
 |-------|------|----------------|
-| `oximqtt-utils` | `oximqtt-utils/` | Shared types (`Bytesize`, `NodeAddr`, `Counter`), serde helpers, timestamp/duration parsing |
-| `oximqtt-macros` | `oximqtt-macros/` | Procedural macros: `#[derive(Metrics)]` for atomic counters |
-| `oximqtt-codec` | `oximqtt-codec/` | MQTT protocol encoder/decoder — v3.1, v3.1.1, v5.0 with version negotiation |
+| `oximqtt` | `oximqtt/` | Core MQTT broker: codec (`codec/`), network (`net/`), utilities (`utils/`), configuration (`conf/`), session management, routing, hooks, built-in modules |
 
-### Layer 2: Infrastructure Crates
-
-Build on foundation crates:
-
-| Crate | Path | Dependencies | Responsibility |
-|-------|------|--------------|----------------|
-| `oximqtt-net` | `oximqtt-net/` | `oximqtt-codec`, `oximqtt-utils` | Network layer: TCP/TLS/WS/QUIC listeners, connection accept, protocol dispatch |
-| `oximqtt-conf` | `oximqtt-conf/` | `oximqtt-codec`, `oximqtt-net`, `oximqtt-utils`, `config` crate | Configuration management: TOML parsing, CLI args, listener config |
-
-### Layer 3: Core Broker
-
-| Crate | Path | Dependencies | Responsibility |
-|-------|------|--------------|----------------|
-| `oximqtt` | `oximqtt/` | All above + `oximqtt-net`, `oximqtt-codec`, `oximqtt-utils`, `oximqtt-macros` (optional), `rust-box`, `dashmap`, `tokio` | Core MQTT broker: session management, routing, hooks, built-in modules, clustering |
-
-### Layer 4: Binaries
+### Binaries & Tools
 
 | Crate | Path | Responsibility |
 |-------|------|----------------|
@@ -364,9 +345,9 @@ The core broker (`oximqtt`) uses Cargo feature flags to conditionally compile tr
 | Feature | What it enables | Key Dependencies |
 |---------|----------------|------------------|
 | `default` | TLS + WebSocket + QUIC transports | — |
-| `tls` | TLS transport | `oximqtt-net/tls` |
-| `ws` | WebSocket transport | `oximqtt-net/ws` |
-| `quic` | QUIC transport | `oximqtt-net/quic` |
+| `tls` | TLS transport | `rustls`, `tokio-rustls`, `x509-parser` |
+| `ws` | WebSocket transport | `tokio-tungstenite` |
+| `quic` | QUIC transport | implies `tls` |
 
 All other functionality (delayed publish, retained messages, metrics, stats, shared subscriptions, auto-subscription, etc.) is compiled unconditionally as built-in modules.
 

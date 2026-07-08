@@ -13,10 +13,10 @@ OXIMQTT has three testing layers:
 ```mermaid
 graph TD
     subgraph L1["Layer 1: Unit Tests"]
-        UT1["oximqtt-codec tests v3/v5 encode decode"]
-        UT2["oximqtt-net tests builder stream"]
-        UT3["oximqtt-utils tests Bytesize NodeAddr parse"]
-        UT4["Other crate tests cfg test modules"]
+        UT1["oximqtt codec tests v3/v5 encode decode"]
+        UT2["oximqtt net tests builder stream"]
+        UT3["oximqtt utils tests Bytesize NodeAddr parse"]
+        UT4["oximqtt conf tests CLI options parsing"]
     end
 
     subgraph L2["Layer 2: Integration Tests"]
@@ -50,11 +50,11 @@ Each crate contains standard `#[cfg(test)]` modules alongside the production cod
 # All unit tests
 cargo test
 
-# Tests for a specific crate
-cargo test -p oximqtt-codec
+# Tests for a specific module
+cargo test -p oximqtt -- codec
 
 # Tests matching a name pattern
-cargo test -p oximqtt-codec -- qos
+cargo test -p oximqtt -- qos
 
 # Run without parallel execution (helpful for debugging)
 cargo test -- --test-threads=1
@@ -67,12 +67,11 @@ cargo test -- --nocapture
 
 | Crate | Test Focus | Key Test Files |
 |-------|-----------|----------------|
-| `oximqtt-codec` | MQTT encode/decode round-trips, version detection, QoS flows | `src/v3/packet.rs`, `src/v5/packet.rs`, `tests/` |
-| `oximqtt-net` | Builder defaults, listener binding, protocol upgrade guards | `src/builder.rs` |
-| `oximqtt-conf` | CLI argument parsing, default values | `src/options.rs` |
-| `oximqtt-utils` | Bytesize parsing, duration parsing, NodeAddr, Counter | `src/lib.rs`, `src/counter.rs` |
+| `oximqtt` (codec) | MQTT encode/decode round-trips, version detection, QoS flows | `src/codec/v3/packet.rs`, `src/codec/v5/packet.rs` |
+| `oximqtt` (net) | Builder defaults, listener binding, protocol upgrade guards | `src/net/builder.rs` |
+| `oximqtt` (conf) | CLI argument parsing, default values | `src/conf/options.rs` |
+| `oximqtt` (utils) | Bytesize parsing, duration parsing, NodeAddr, Counter | `src/utils/mod.rs`, `src/utils/counter.rs` |
 | `oximqtt` | Session management, inflight tracking, subscription trie | Various modules |
-| `oximqtt-macros` | Macro expansion correctness | `src/metrics.rs` |
 
 ---
 
@@ -136,7 +135,7 @@ The test scheduler uses DAG-based dependency ordering with timeout and retry sup
 The test harness includes a custom MQTT client implementation with zero third-party MQTT dependencies:
 
 - **Transport**: Async TCP via `tokio::net::TcpStream`
-- **Codec**: Based on `oximqtt-codec` for v3/v5 protocol
+- **Codec**: Based on `oximqtt::codec` for v3/v5 protocol
 - **QoS State Machine**: Automatic PUBACK/PUBREC/PUBCOMP handling
 - **Packet Types**: All standard MQTT packet types supported
 
@@ -194,8 +193,6 @@ The test harness supports stress testing out of the box:
 ./target/release/mqtt_harness --no-broker --suites stress \
   --stress-clients 10000
 ```
-
-For comprehensive benchmarking, see the [Benchmark Testing Guide](../benchmark-testing.md).
 
 ---
 
@@ -316,4 +313,3 @@ cargo fmt --all && cargo clippy --all-targets && cargo test
 ## Related Resources
 
 - [CONTRIBUTING.md](../../CONTRIBUTING.md) — Contribution guidelines
-- [benchmark-testing.md](../benchmark-testing.md) — Performance benchmark details

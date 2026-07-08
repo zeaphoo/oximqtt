@@ -11,7 +11,7 @@ Core MQTT broker library — session management, routing, hooks, built-in module
 
 ```
 oximqtt/src/
-├── lib.rs          — re-exports: oximqtt_codec as codec, oximqtt_net as net, oximqtt_utils as utils
+├── lib.rs          — modules: codec, net, utils, conf, builtins, and broker core
 │
 ├── acl.rs          — Access Control List types (ACLConfig, AclCheckFn, AuthInfo)
 ├── args.rs         — CommandArgs struct (node_id)
@@ -47,19 +47,19 @@ oximqtt/src/
 | Feature | Deps enabled | What it enables |
 |---------|-------------|-----------------|
 | `default` | tls, ws, quic | All transport layers |
-| `tls` | oximqtt-net/tls | TLS transport |
-| `ws` | oximqtt-net/ws | WebSocket transport |
-| `quic` | oximqtt-net/quic | QUIC transport |
+| `tls` | rustls, tokio-rustls, x509-parser | TLS transport |
+| `ws` | tokio-tungstenite | WebSocket transport |
+| `quic` | tls (implies) | QUIC transport |
 
 All other functionality (delayed publish, retained messages, metrics, stats, shared subscriptions, auto-subscription, etc.) is compiled unconditionally as built-in modules.
 
-## Re-exports
+## Modules
 
 ```rust
-pub use oximqtt_codec as codec;   // MQTT protocol codec
-pub use oximqtt_net as net;       // Network layer (Builder, MqttStream, etc.)
-pub use oximqtt_utils as utils;   // Utilities (Bytesize, NodeAddr, etc.)
-pub use oximqtt_macros as macros; // [feature: metrics] Derive macros
+pub mod codec;   // MQTT protocol codec (v3/v5)
+pub mod net;     // Network layer (Builder, MqttStream, etc.)
+pub mod utils;   // Utilities (Bytesize, NodeAddr, etc.)
+pub mod conf;    // Configuration management
 pub use net::{Error, Result};   // Re-exported error types
 ```
 

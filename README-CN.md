@@ -64,19 +64,19 @@ oximqtt = "0.22"
 | `[log]` | 日志配置 |
 | `[mqtt]` | 协议限制 |
 
-详见 [配置指南](./oximqtt-conf/README-CN.md)。
+详见 [配置指南](docs/zh_CN/configuration.md)。
 
 ## 文档资源
 
 | 资源 | 说明 |
 |------|------|
 | [架构概览](docs/zh_CN/architecture/overview.md) | 系统架构和模块设计 |
-| [配置指南](./oximqtt-conf/README-CN.md) | 所有配置项及默认值 |
+| [配置指南](docs/zh_CN/configuration.md) | 所有配置项及默认值 |
 | [开发入门](docs/zh_CN/development/getting-started.md) | 构建、测试、开发工作流 |
 | [测试指南](docs/zh_CN/development/testing.md) | 单元测试、集成测试、互操作性 |
 | [贡献指南](CONTRIBUTING-CN.md) | 如何贡献代码 |
 | [更新日志](CHANGELOG.md) | 版本历史 |
-| 子项目文档 | [oximqtt](./oximqtt/README-CN.md)、[oximqtt-bin](./oximqtt-bin/README-CN.md)、[oximqtt-codec](./oximqtt-codec/README-CN.md)、[oximqtt-net](./oximqtt-net/README-CN.md)、[oximqtt-conf](./oximqtt-conf/README-CN.md)、[oximqtt-utils](./oximqtt-utils/README-CN.md)、[oximqtt-macros](./oximqtt-macros/README-CN.md) |
+| 项目文档 | [oximqtt](./oximqtt/README-CN.md)、[oximqtt-bin](./oximqtt-bin/README-CN.md) |
 
 ## 端口
 

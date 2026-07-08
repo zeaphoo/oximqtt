@@ -11,7 +11,7 @@
 
 ```
 oximqtt/src/
-├── lib.rs          — 重新导出：oximqtt_codec as codec、oximqtt_net as net、oximqtt_utils as utils
+├── lib.rs          — 模块：codec、net、utils、conf、builtins 及 Broker 核心
 │
 ├── acl.rs          — ACL 类型（ACLConfig、AclCheckFn、AuthInfo）
 ├── args.rs         — CommandArgs 结构体（node_id）
@@ -47,19 +47,19 @@ oximqtt/src/
 | Feature | 启用的依赖 | 说明 |
 |---------|-------------|------|
 | `default` | tls, ws, quic | 所有传输层 |
-| `tls` | oximqtt-net/tls | TLS 传输 |
-| `ws` | oximqtt-net/ws | WebSocket 传输 |
-| `quic` | oximqtt-net/quic | QUIC 传输 |
+| `tls` | rustls, tokio-rustls, x509-parser | TLS 传输 |
+| `ws` | tokio-tungstenite | WebSocket 传输 |
+| `quic` | tls（隐含） | QUIC 传输 |
 
 其他所有功能（延迟发布、保留消息、指标统计、共享订阅、自动订阅等）均作为内置模块无条件编译。
 
-## 重新导出
+## 模块
 
 ```rust
-pub use oximqtt_codec as codec;   // MQTT 协议编解码
-pub use oximqtt_net as net;       // 网络层（Builder、MqttStream 等）
-pub use oximqtt_utils as utils;   // 工具（Bytesize、NodeAddr 等）
-pub use oximqtt_macros as macros; // [feature: metrics] 派生宏
+pub mod codec;   // MQTT 协议编解码（v3/v5）
+pub mod net;     // 网络层（Builder、MqttStream 等）
+pub mod utils;   // 工具（Bytesize、NodeAddr 等）
+pub mod conf;    // 配置管理
 pub use net::{Error, Result};   // 重新导出的错误类型
 ```
 

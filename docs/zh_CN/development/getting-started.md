@@ -37,7 +37,6 @@ cargo build
 cargo build --release
 
 # 构建特定子 crate
-cargo build -p oximqtt-codec
 cargo build -p oximqttd
 ```
 
@@ -52,7 +51,7 @@ cargo build -p oximqttd
 ```bash
 cargo check              # 快速验证（不生成二进制）
 cargo build -p oximqtt     # 构建特定 crate
-cargo test -p oximqtt-codec # 运行 crate 的单元测试
+cargo test -p oximqtt      # 运行单元测试
 ```
 
 ### 代码检查
@@ -114,7 +113,7 @@ cargo build -p oximqtt --no-default-features --features "tls"
 
 ## 内置模块开发
 
-部分功能模块（oximqtt-acl、oximqtt-retainer、oximqtt-auth-jwt、oximqtt-sys-topic）已合并到 oximqtt 核心 crate 中作为内置模块。如需扩展功能，可通过钩子系统（Hook）实现。
+部分功能模块（acl、retainer、auth_jwt、sys_topic）已合并到 oximqtt 核心 crate 中作为内置模块。如需扩展功能，可通过钩子系统（Hook）实现。
 
 更详细的贡献指南请参阅 [CONTRIBUTING.md](../../CONTRIBUTING.md)。
 

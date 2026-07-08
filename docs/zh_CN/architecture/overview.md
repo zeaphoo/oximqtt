@@ -91,32 +91,13 @@ graph TB
 
 工作区分为以下层级：
 
-### 第一层：基础 Crate
-
-不依赖其他工作区 crate：
+### 核心库
 
 | Crate | 路径 | 职责 |
 |-------|------|------|
-| `oximqtt-utils` | `oximqtt-utils/` | 共享类型（`Bytesize`、`NodeAddr`、`Counter`）、serde 辅助、时间戳/间隔解析 |
-| `oximqtt-macros` | `oximqtt-macros/` | 过程宏：`#[derive(Metrics)]` 原子计数器 |
-| `oximqtt-codec` | `oximqtt-codec/` | MQTT 协议编解码 — v3.1、v3.1.1、v5.0 带版本协商 |
+| `oximqtt` | `oximqtt/` | 核心 MQTT Broker：编解码（`codec/`）、网络（`net/`）、工具（`utils/`）、配置（`conf/`）、会话管理、路由、钩子、内置模块 |
 
-### 第二层：基础设施 Crate
-
-基于基础 crate 构建：
-
-| Crate | 路径 | 依赖 | 职责 |
-|-------|------|------|------|
-| `oximqtt-net` | `oximqtt-net/` | `oximqtt-codec`、`oximqtt-utils` | 网络层：TCP/TLS/WS/QUIC 监听器、连接接受、协议分发 |
-| `oximqtt-conf` | `oximqtt-conf/` | `oximqtt-codec`、`oximqtt-net`、`oximqtt-utils`、`config` | 配置管理：TOML 解析、CLI 参数、监听器配置 |
-
-### 第三层：核心 Broker
-
-| Crate | 路径 | 依赖 | 职责 |
-|-------|------|------|------|
-| `oximqtt` | `oximqtt/` | 以上所有 + `oximqtt-net`、`oximqtt-codec`、`oximqtt-utils`、`oximqtt-macros`（可选）、`rust-box`、`dashmap`、`tokio` | 核心 MQTT Broker：会话管理、路由、钩子、内置模块、集群 |
-
-### 第四层：二进制入口
+### 二进制入口与工具
 
 | Crate | 路径 | 职责 |
 |-------|------|------|
@@ -343,9 +324,9 @@ flowchart LR
 | Feature | 启用内容 | 关键依赖 |
 |---------|----------|----------|
 | `default` | TLS + WebSocket + QUIC 传输 | — |
-| `tls` | TLS 传输 | `oximqtt-net/tls` |
-| `ws` | WebSocket 传输 | `oximqtt-net/ws` |
-| `quic` | QUIC 传输 | `oximqtt-net/quic` |
+| `tls` | TLS 传输 | `rustls`、`tokio-rustls`、`x509-parser` |
+| `ws` | WebSocket 传输 | `tokio-tungstenite` |
+| `quic` | QUIC 传输 | 隐含 `tls` |
 
 其他所有功能（延迟发布、保留消息、指标统计、共享订阅、自动订阅等）均作为内置模块无条件编译。
 

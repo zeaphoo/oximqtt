@@ -33,7 +33,7 @@ cd paho.mqtt.testing/interoperability
 | `test_redelivery_on_reconnect` | ✅ 通过 | — |
 | `test_dollar_topics` | ✅ 通过 | — |
 | `test_unsubscribe` | ✅ 通过 | — |
-| `test_subscribe_failure` | ✅ 通过 | 需在 `oximqtt-acl.toml` 首行添加：`["deny", "all", "subscribe", ["test/nosubscribe"]]` |
+| `test_subscribe_failure` | ✅ 通过 | 需在 `acl` 配置首行添加：`["deny", "all", "subscribe", ["test/nosubscribe"]]` |
 | `test_zero_length_clientid` | ✅ 通过 | — |
 
 ### MQTT V5.0 — 24/24 通过
@@ -109,20 +109,18 @@ cargo build -p oximqtt-test --release
 
 ### 连接并发性能
 
-| 指标 | 单节点 | Raft 集群（3 节点） |
-|------|--------|-------------------|
-| 并发客户端总数 | 1,000,000 | 1,000,000 |
-| 连接握手速率 | 5,500-7,000/秒 | 5,000-7,000/秒 |
+| 指标 | 数值 |
+|------|------|
+| 并发客户端总数 | 1,000,000 |
+| 连接握手速率 | 5,500-7,000/秒 |
 
 ### 消息吞吐性能
 
-| 指标 | 单节点 | Raft 集群（3 节点） |
-|------|--------|-------------------|
-| 订阅客户端数 | 1,000,000 | 1,000,000 |
-| 发布客户端数 | 40 | 40 |
-| 消息吞吐速率 | 150,000 条/秒 | 156,000 条/秒 |
-
-[详细基准测试文档 →](./benchmark-testing.md)
+| 指标 | 数值 |
+|------|------|
+| 订阅客户端数 | 1,000,000 |
+| 发布客户端数 | 40 |
+| 消息吞吐速率 | 150,000 条/秒 |
 
 ---
 

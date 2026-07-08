@@ -109,20 +109,18 @@ cargo build -p oximqtt-test --release
 
 ### Connection Concurrency
 
-| Metric | Single Node | Raft Cluster (3 nodes) |
-|--------|-------------|----------------------|
-| Total Concurrent Clients | 1,000,000 | 1,000,000 |
-| Connection Handshake Rate | 5,500-7,000/s | 5,000-7,000/s |
+| Metric | Value |
+|--------|-------|
+| Total Concurrent Clients | 1,000,000 |
+| Connection Handshake Rate | 5,500-7,000/s |
 
 ### Message Throughput
 
-| Metric | Single Node | Raft Cluster (3 nodes) |
-|--------|-------------|----------------------|
-| Subscription Clients | 1,000,000 | 1,000,000 |
-| Publishing Clients | 40 | 40 |
-| Message Throughput Rate | 150,000 msg/s | 156,000 msg/s |
-
-[Detailed benchmark documentation →](./benchmark-testing.md)
+| Metric | Value |
+|--------|-------|
+| Subscription Clients | 1,000,000 |
+| Publishing Clients | 40 |
+| Message Throughput Rate | 150,000 msg/s |
 
 ---
 

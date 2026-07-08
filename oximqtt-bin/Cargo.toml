@@ -15,9 +15,6 @@ rust-version.workspace = true
 name = "oximqttd"
 path = "src/server.rs"
 
-[target.'cfg(target_os = "linux")'.dependencies]
-tikv-jemallocator = "0.6"
-
 [dependencies]
 tokio = { workspace = true, features = ["macros", "rt-multi-thread", "signal"] }
 oximqtt.workspace = true

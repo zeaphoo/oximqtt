@@ -64,19 +64,19 @@ All configuration is in a single `oximqtt.toml` file. Key sections:
 | `[log]` | Logging configuration |
 | `[mqtt]` | Protocol limits |
 
-See [Configuration Guide](./oximqtt-conf/README.md) for all options.
+See [Configuration Guide](docs/en_US/configuration.md) for all options.
 
 ## Documentation
 
 | Resource | Description |
 |----------|-------------|
 | [Architecture Overview](docs/en_US/architecture/overview.md) | System architecture and module design |
-| [Configuration Guide](./oximqtt-conf/README.md) | All configuration options with defaults |
+| [Configuration Guide](docs/en_US/configuration.md) | All configuration options with defaults |
 | [Developer Guide](docs/en_US/development/getting-started.md) | Build, test, development workflow |
 | [Testing Guide](docs/en_US/development/testing.md) | Unit tests, integration tests, interoperability |
 | [Contributing Guide](CONTRIBUTING.md) | How to contribute code |
 | [Changelog](CHANGELOG.md) | Release history |
-| Sub-crate docs | [oximqtt](./oximqtt/README.md), [oximqtt-bin](./oximqtt-bin/README.md), [oximqtt-codec](./oximqtt-codec/README.md), [oximqtt-net](./oximqtt-net/README.md), [oximqtt-conf](./oximqtt-conf/README.md), [oximqtt-utils](./oximqtt-utils/README.md), [oximqtt-macros](./oximqtt-macros/README.md) |
+| Crate docs | [oximqtt](./oximqtt/README.md), [oximqtt-bin](./oximqtt-bin/README.md) |
 
 ## Ports
 

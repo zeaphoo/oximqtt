@@ -11,10 +11,10 @@
 ```mermaid
 graph TD
     subgraph L1["第一层: 单元测试"]
-        UT1["oximqtt-codec 测试 v3/v5 编解码"]
-        UT2["oximqtt-net 测试 构建器 流"]
-        UT3["oximqtt-utils 测试 Bytesize NodeAddr 解析"]
-        UT4["其他 crate 测试 cfg test 模块"]
+        UT1["oximqtt codec 测试 v3/v5 编解码"]
+        UT2["oximqtt net 测试 构建器 流"]
+        UT3["oximqtt utils 测试 Bytesize NodeAddr 解析"]
+        UT4["oximqtt conf 测试 CLI 参数解析"]
     end
 
     subgraph L2["第二层: 集成测试"]
@@ -44,11 +44,11 @@ graph TD
 # 运行所有单元测试
 cargo test
 
-# 特定 crate
-cargo test -p oximqtt-codec
+# 特定模块
+cargo test -p oximqtt -- codec
 
 # 匹配名称模式
-cargo test -p oximqtt-codec -- qos
+cargo test -p oximqtt -- qos
 ```
 
 每个 crate 包含 `#[cfg(test)]` 模块。关键测试文件分布在各 crate 的 `src/` 目录中。
@@ -143,8 +143,6 @@ mod tests {
 ./target/release/mqtt_harness --no-broker --suites stress \
   --stress-clients 10000
 ```
-
-详细的基准测试结果见 [基准测试文档](../benchmark-testing.md)。
 
 ---
 

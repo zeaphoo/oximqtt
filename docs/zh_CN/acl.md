@@ -7,7 +7,7 @@
 #### 内置模块：
 
 ```bash
-oximqtt-acl
+acl
 ```
 
 #### 配置位置：
@@ -91,7 +91,7 @@ rules = [
 在 `[acl]` 配置修改完成后，并不会自动加载至 OXIMQTT 系统。需要手动执行：
 
 ```bash
-curl -X PUT "http://127.0.0.1:6060/api/v1/plugins/1/oximqtt-acl/config/reload"
+curl -X PUT "http://127.0.0.1:6060/api/v1/builtins/acl/config/reload"
 ```
 
 ## 占位符
