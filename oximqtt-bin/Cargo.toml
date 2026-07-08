@@ -1,0 +1,33 @@
+[package]
+name = "oximqttd"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description.workspace = true
+categories.workspace = true
+keywords.workspace = true
+exclude.workspace = true
+rust-version.workspace = true
+
+[[bin]]
+name = "oximqttd"
+path = "src/server.rs"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+tikv-jemallocator = "0.6"
+
+[dependencies]
+tokio = { workspace = true, features = ["macros", "rt-multi-thread", "signal"] }
+oximqtt.workspace = true
+oximqtt-conf.workspace = true
+oximqtt-net.workspace = true
+clap.workspace = true
+log.workspace = true
+tracing.workspace = true
+tracing-subscriber = { workspace = true, features = ["env-filter"] }
+tracing-appender.workspace = true
+anyhow.workspace = true
+chrono = { workspace = true, features = ["clock"] }
+time = { workspace = true, features = ["local-offset"] }

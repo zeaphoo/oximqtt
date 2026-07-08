@@ -1,0 +1,213 @@
+//! Binary entry point for the OXIMQTT broker.
+//!
+//! Parses CLI arguments, loads configuration, initializes the logger, creates
+//! the server context, registers plugins, binds listeners (TCP, TLS, WebSocket,
+//! WSS, QUIC), and starts the MQTT server. Handles OS signal-based shutdown.
+
+#![deny(unsafe_code)]
+
+use std::time::Duration;
+
+use clap::Parser;
+
+use oximqtt::args::CommandArgs;
+use oximqtt::context::ServerContext;
+use oximqtt::net::{tls_provider, Builder};
+use oximqtt::node::Node;
+use oximqtt::server::MqttServer;
+use oximqtt::Result;
+use oximqtt_conf::{listener::Listener, Options, Settings};
+
+mod logger;
+
+#[cfg(target_os = "linux")]
+#[global_allocator]
+static GLOBAL: tikv_jemallocator::Jemalloc = tikv_jemallocator::Jemalloc;
+
+#[tokio::main]
+async fn main() -> Result<()> {
+    let opts = Options::parse();
+    if opts.version {
+        println!("{} rustc/{}", Node::version(), Node::rustc_version());
+        return Ok(());
+    }
+
+    //init config
+    let conf = Settings::init(Options::parse()).expect("settings init failed");
+
+    //rustls crypto install default
+    tls_provider::default_provider()
+        .install_default()
+        .expect("Failed to install the default Rustls crypto backend because it is already installed.");
+
+    //init log
+    logger::logger_init(&conf.log).expect("logger init failed");
+
+    //node info
+    let node = Node::new(
+        conf.node.id,
+        conf.node.busy.loadavg,
+        conf.node.busy.cpuloadavg,
+        conf.node.busy.update_interval,
+    );
+
+    //print version
+    log::info!("Starting oximqtt (version={}, rustc={})", Node::version(), Node::rustc_version());
+
+    let _ = Settings::logs();
+
+    //init ServerContext
+    let scx = ServerContext::new()
+        .args(config_args(conf))
+        .node(node)
+        .task_exec_workers(conf.task.exec_workers)
+        .task_exec_queue_max(conf.task.exec_queue_max)
+        .busy_check_enable(conf.node.busy.check_enable)
+        .busy_handshaking_limit(conf.node.busy.handshaking)
+        .mqtt_delayed_publish_max(conf.mqtt.delayed_publish_max)
+        .mqtt_delayed_publish_immediate(conf.mqtt.delayed_publish_immediate)
+        .mqtt_max_sessions(conf.mqtt.max_sessions)
+        .build()
+        .await;
+
+    //init built-in modules
+    oximqtt::builtins::init_all(&scx).await.expect("builtins init failed");
+
+    let mut builder = MqttServer::new(scx);
+
+    //tcp
+    for (_, listen_cfg) in Settings::instance().listeners.tcps.iter() {
+        let listener = match config_builder(listen_cfg).bind() {
+            Ok(l) => l.tcp()?,
+            Err(e) => {
+                log::error!("Failed to bind TCP listener on {}: {}", listen_cfg.addr, e);
+                return Err(e);
+            }
+        };
+        builder = builder.listener(listener);
+    }
+
+    //tls
+    for (_, listen_cfg) in Settings::instance().listeners.tlss.iter() {
+        let listener = match config_builder(listen_cfg).bind() {
+            Ok(l) => l.tls()?,
+            Err(e) => {
+                log::error!("Failed to bind TLS listener on {}: {}", listen_cfg.addr, e);
+                return Err(e);
+            }
+        };
+        builder = builder.listener(listener);
+    }
+
+    //websocket
+    for (_, listen_cfg) in Settings::instance().listeners.wss.iter() {
+        let listener = match config_builder(listen_cfg).bind() {
+            Ok(l) => l.ws()?,
+            Err(e) => {
+                log::error!("Failed to bind WebSocket listener on {}: {}", listen_cfg.addr, e);
+                return Err(e);
+            }
+        };
+        builder = builder.listener(listener);
+    }
+
+    //tls-websocket
+    for (_, listen_cfg) in Settings::instance().listeners.wsss.iter() {
+        let listener = match config_builder(listen_cfg).bind() {
+            Ok(l) => l.wss()?,
+            Err(e) => {
+                log::error!("Failed to bind WSS listener on {}: {}", listen_cfg.addr, e);
+                return Err(e);
+            }
+        };
+        builder = builder.listener(listener);
+    }
+
+    //MQTT over QUIC
+    for (_, listen_cfg) in Settings::instance().listeners.quics.iter() {
+        let listener = match config_builder(listen_cfg).bind_quic() {
+            Ok(l) => l,
+            Err(e) => {
+                log::error!("Failed to bind QUIC listener on {}: {}", listen_cfg.addr, e);
+
+                return Err(e);
+            }
+        };
+        builder = builder.listener(listener);
+    }
+
+    builder.build().start();
+
+    let (shutdown_tx, shutdown_rx) = tokio::sync::oneshot::channel();
+
+    // Listen for Ctrl+C
+    tokio::spawn(async move {
+        #[cfg(target_os = "windows")]
+        tokio::signal::ctrl_c().await.expect("Failed to listen for ctrl-c");
+        #[cfg(not(target_os = "windows"))]
+        {
+            use tokio::signal::unix::{signal, SignalKind};
+            let mut term_signal = signal(SignalKind::terminate()).expect("Failed to create signal handler");
+            tokio::select! {
+                _ = tokio::signal::ctrl_c() => {}
+                _ = term_signal.recv() => {}
+            }
+        }
+        shutdown_tx.send(()).expect("Failed to send the shutdown command");
+    });
+
+    shutdown_rx.await.expect("Failed to receive the shutdown command");
+    //log::info!("Performing cleanup..."); @TODO ... Hook when exiting
+
+    tokio::time::sleep(Duration::from_millis(100)).await;
+    std::process::exit(0);
+}
+
+fn config_builder(cfg: &Listener) -> Builder {
+    Builder::new()
+        .name(cfg.name.as_str())
+        .laddr(cfg.addr)
+        .max_connections(cfg.max_connections)
+        .max_handshaking_limit(cfg.max_handshaking_limit)
+        .max_packet_size(cfg.max_packet_size.as_u32())
+        .backlog(cfg.backlog)
+        .nodelay(cfg.nodelay)
+        .reuseaddr(cfg.reuseaddr)
+        .reuseport(cfg.reuseport)
+        .allow_anonymous(cfg.allow_anonymous)
+        .min_keepalive(cfg.min_keepalive)
+        .max_keepalive(cfg.max_keepalive)
+        .allow_zero_keepalive(cfg.allow_zero_keepalive)
+        .keepalive_backoff(cfg.keepalive_backoff)
+        .max_inflight(cfg.max_inflight)
+        .handshake_timeout(cfg.handshake_timeout)
+        .max_mqueue_len(cfg.max_mqueue_len)
+        .mqueue_rate_limit(cfg.mqueue_rate_limit.0, cfg.mqueue_rate_limit.1)
+        .max_clientid_len(cfg.max_clientid_len)
+        .max_qos_allowed(cfg.max_qos_allowed)
+        .max_topic_levels(cfg.max_topic_levels)
+        .session_expiry_interval(cfg.session_expiry_interval)
+        .max_session_expiry_interval(cfg.max_session_expiry_interval)
+        .message_retry_interval(cfg.message_retry_interval)
+        .message_expiry_interval(cfg.message_expiry_interval)
+        .max_subscriptions(cfg.max_subscriptions)
+        .max_topic_aliases(cfg.max_topic_aliases)
+        .tls_cross_certificate(cfg.cross_certificate)
+        .tls_cert(cfg.cert.clone())
+        .tls_key(cfg.key.clone())
+        .tls_client_ca_certs(cfg.client_ca_certs.clone())
+        .limit_subscription(cfg.limit_subscription)
+        .delayed_publish(cfg.delayed_publish)
+        .proxy_protocol(cfg.proxy_protocol)
+        .proxy_protocol_timeout(cfg.proxy_protocol_timeout)
+        .cert_cn_as_username(cfg.cert_cn_as_username)
+        .cert_subject_dn_as_username(cfg.cert_subject_dn_as_username)
+        .collect_cert_info(cfg.collect_cert_info)
+        .idle_timeout(cfg.idle_timeout)
+}
+
+fn config_args(cfg: &Settings) -> CommandArgs {
+    CommandArgs {
+        node_id: cfg.opts.node_id,
+    }
+}

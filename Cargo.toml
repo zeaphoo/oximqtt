@@ -1,0 +1,109 @@
+[workspace]
+resolver = "2"
+members = [
+    "oximqtt",
+    "oximqtt-bin",
+    "oximqtt-macros",
+    "oximqtt-codec",
+    "oximqtt-net",
+    "oximqtt-conf",
+    "oximqtt-utils",
+    "oximqtt-test",
+    "oximqtt/examples/*",
+]
+
+[patch.crates-io]
+oximqtt = { path = "oximqtt" }
+oximqtt-codec = { path = "oximqtt-codec" }
+oximqtt-net = { path = "oximqtt-net" }
+oximqtt-conf = { path = "oximqtt-conf" }
+oximqtt-macros = { path = "oximqtt-macros" }
+oximqtt-utils = { path = "oximqtt-utils" }
+
+
+[workspace.package]
+version = "0.22.0"
+edition = "2021"
+authors = ["oximqtt <oximqttd@126.com>"]
+description = "MQTT Server for v3.1, v3.1.1 and v5.0 protocols"
+repository = "https://github.com/zeaphoo/oximqtt.git"
+license = "MIT OR Apache-2.0"
+categories = ["network-programming"]
+keywords = ["MQTT", "IoT", "messaging", "MQTT-Server", "MQTT-Broker"]
+exclude = [".gitignore", ".cargo/config"]
+rust-version = "1.89.0"
+
+
+[workspace.dependencies]
+oximqtt = "0.22.0"
+oximqtt-codec = "0.2.2"
+oximqtt-net = "0.3.5"
+oximqtt-conf = "0.3.5"
+oximqtt-macros = "0.1.2"
+oximqtt-utils = "0.1.6"
+
+tokio = { version = "1",  default-features = false }
+futures = "0.3"
+serde = "1.0"
+tokio-util = "0.7"
+tokio-rustls = "0.26"
+socket2 = "0.5"
+prost = "0.13"
+rustls = "0.23"
+once_cell = "1.21.3"
+dashmap = "6.1.0"
+ahash = "0.8"
+bytes = "1.10"
+bytestring = "1.4"
+thiserror = "1.0.69"
+anyhow = "1.0.99"
+async-trait = "0.1"
+serde_json = "1.0"
+chrono = { version = "0.4", default-features = false }
+uuid = "1.11.0"
+rand = "0.9.0"
+governor = "0.10"
+config = { version = "0.15.8", default-features = false}
+log = "0.4"
+tracing = "0.1"
+tracing-subscriber = "0.3"
+tracing-appender = "0.2"
+base64 = "0.22"
+postcard = { version = "1.1", features = ["use-std"] }
+url = { version = "2.5.4", default-features = false }
+systemstat = "0.2"
+itertools = "0.14"
+clap = { version = "4", features = ["derive"] }
+tokio-tungstenite = "0.29"
+
+bitflags = "2.9.2"
+leaky-bucket = "1.1.2"
+scc = "2.3.4"
+get-size2 = "0.9"
+prometheus = "0.14"
+futures-time = "3.0"
+nonzero_ext = "0.3"
+itoa = "1.0.15"
+simple_logger = "5.0.0"
+regex = "1.11.1"
+backoff = "0.4"
+toml = "0.9"
+rust-box = "0.18"
+scopeguard = "1"
+rayon = "1.11.0"
+parking_lot = "0.12.4"
+proxy-protocol = "0.5"
+jsonwebtoken = "9.3.1"
+quinn = "0.11.6"
+time = "0.3"
+strum = "0.26"
+
+[profile.dev]
+opt-level = 0
+
+[profile.release]
+lto = true
+opt-level = 's'
+codegen-units = 1
+panic = "abort"
+

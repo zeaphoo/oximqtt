@@ -1,0 +1,90 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            name: linux-amd64
+          - os: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-musl
+            name: linux-arm64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install musl tools
+        run: |
+          if command -v sudo >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y musl-tools
+          else
+            apt-get update
+            apt-get install -y musl-tools
+          fi
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.target }}
+
+      - name: Build
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Prepare artifact
+        run: |
+          mkdir -p dist
+          cp target/${{ matrix.target }}/release/oximqttd dist/
+          cp oximqtt.toml dist/
+          chmod +x dist/oximqttd
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: oximqtt-${{ matrix.name }}
+          path: dist/
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Create archives
+        run: |
+          cd artifacts
+          tar -czvf ../oximqtt-linux-amd64.tar.gz oximqttd oximqtt.toml
+          # Separate arm64 if present
+          if [ -d "oximqtt-linux-arm64" ]; then
+            cd oximqtt-linux-arm64
+            tar -czvf ../../oximqtt-linux-arm64.tar.gz oximqttd oximqtt.toml
+          fi
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            oximqtt-linux-*.tar.gz
+          generate_release_notes: true
