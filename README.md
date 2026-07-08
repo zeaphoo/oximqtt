@@ -33,16 +33,6 @@ A lightweight, high-performance MQTT broker written in 100% safe Rust. Built on 
 
 ## Quick Start
 
-### Run with Docker
-
-```bash
-mkdir -p /app/log/oximqtt
-docker run -d --name oximqtt \
-  -p 1883:1883 -p 8883:8883 -p 8080:8080 -p 8443:8443 \
-  -v /app/log/oximqtt:/var/log/oximqtt \
-  oximqtt/oximqtt:latest
-```
-
 ### Build from source
 
 ```bash

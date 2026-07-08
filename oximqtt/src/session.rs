@@ -850,12 +850,6 @@ impl SessionState {
 
                 let message_storage_available = self.scx.extends.message_mgr().await.enable();
 
-                let message_expiry_interval =
-                    if message_storage_available || (p.retain && self.scx.extends.retain().await.enable()) {
-                        Some(self.fitter.message_expiry_interval(&p))
-                    } else {
-                        None
-                    };
                 let message_expiry_interval = if message_storage_available {
                     Some(self.fitter.message_expiry_interval(&p))
                 } else {
@@ -1614,11 +1608,6 @@ impl SessionState {
         log::debug!("{from:?}");
         log::debug!("{publish:?}");
         //make message id
-        let msg_id = if message_storage_available {
-            Some(scx.extends.message_mgr().await.next_msg_id())
-        } else {
-            None
-        };
         #[allow(unused_variables)]
         let msg_id: Option<MsgID> = None;
 

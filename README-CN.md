@@ -33,16 +33,6 @@
 
 ## 快速开始
 
-### Docker 运行
-
-```bash
-mkdir -p /app/log/oximqtt
-docker run -d --name oximqtt \
-  -p 1883:1883 -p 8883:8883 -p 8080:8080 -p 8443:8443 \
-  -v /app/log/oximqtt:/var/log/oximqtt \
-  oximqtt/oximqtt:latest
-```
-
 ### 从源码编译
 
 ```bash

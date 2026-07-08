@@ -192,10 +192,6 @@ impl Stats {
             self.message_storages.max_max(message_mgr.max().await);
         }
 
-        let retaineds = {
-            let retain = scx.extends.retain().await;
-            Counter::new_with(retain.count().await, retain.max().await, retain.stats_merge_mode())
-        };
         let retaineds = Counter::default();
 
         {

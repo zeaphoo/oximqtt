@@ -54,7 +54,7 @@ gen_ext_file_conf(){
 basicConstraints = critical, CA:false
 keyUsage = nonRepudiation, digitalSignature
 subjectKeyIdentifier = hash
-authorityKeyIdentifier = keyid:authorityKeyIdentifier,issuer:always
+authorityKeyIdentifier = keyid,issuer:always
 subjectAltName = @alt_names
 extendedKeyUsage = critical, serverAuth
 
@@ -63,7 +63,7 @@ basicConstraints = critical, CA:false
 keyUsage = nonRepudiation, digitalSignature
 extendedKeyUsage = critical, clientAuth
 subjectKeyIdentifier = hash
-authorityKeyIdentifier = keyid:authorityKeyIdentifier,issuer:always
+authorityKeyIdentifier = keyid,issuer:always
 
 [ alt_names ]
 EOF
@@ -97,7 +97,10 @@ gen_root(){
         -out ${ROOT_CERT_FILE} \
         -sha256 \
         -batch \
-        -config ${ROOT_CA_CONFIG_FILE}
+        -config ${ROOT_CA_CONFIG_FILE} \
+        -addext "basicConstraints=critical,CA:TRUE" \
+        -addext "keyUsage=critical,keyCertSign,cRLSign" \
+        -addext "subjectKeyIdentifier=hash"
 }
 
 gen_server(){

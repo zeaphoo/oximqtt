@@ -18,12 +18,14 @@ WORKDIR /app/oximqtt
 
 VOLUME ["/var/log/oximqtt"]
 
-# oximqtt will occupy these port:
-# - 1883 port for MQTT
-# - 8883 port for MQTT(TLS)
-# - 11883 port for internal MQTT/TCP
-# - 6060 for APIs
-EXPOSE 1883 8883 11883 6060
+# oximqtt will occupy these ports:
+# - 1883  for MQTT/TCP
+# - 8883  for MQTT/TLS
+# - 8080  for MQTT/WebSocket
+# - 8443  for MQTT/WebSocket-TLS
+# - 9443  for MQTT/QUIC (UDP)
+# - 11883 for internal MQTT/TCP
+EXPOSE 1883 8883 8080 8443 9443/udp 11883
 
 ENTRYPOINT ["sh", "-c", "/app/oximqtt/oximqtt-bin/oximqttd \"$@\"", "--"]
 

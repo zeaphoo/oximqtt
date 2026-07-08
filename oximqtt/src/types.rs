@@ -559,9 +559,6 @@ pub fn parse_topic_filter(
                     return Err(anyhow!(format!("Shared subscription is not enabled, {:?}", topic_filter)));
                 }
             },
-            (Some(&"$share"), _, _) => {
-                return Err(anyhow!(format!("Shared subscription is not enabled, {:?}", topic_filter)));
-            }
             (Some(&"$limit"), limit, tf) => match (limit_subscription, limit, tf) {
                 (true, Some(limit), Some(tf)) => {
                     let tf = TopicFilter::from(*tf);
