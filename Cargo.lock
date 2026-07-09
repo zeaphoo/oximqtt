@@ -1473,7 +1473,7 @@ checksum = "7c87def4c32ab89d880effc9e097653c8da5d6ef28e6b539d313baaacfbafcbe"
 
 [[package]]
 name = "oximqtt"
-version = "0.22.0-rc1"
+version = "0.22.0"
 dependencies = [
  "ahash",
  "anyhow",
@@ -1551,7 +1551,7 @@ dependencies = [
 
 [[package]]
 name = "oximqttd"
-version = "0.22.0-rc1"
+version = "0.22.0"
 dependencies = [
  "anyhow",
  "chrono",
