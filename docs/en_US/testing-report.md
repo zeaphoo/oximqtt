@@ -46,7 +46,6 @@ cd paho.mqtt.testing/interoperability
 | `test_dollar_topics` | ✅ OK | — |
 | `test_unsubscribe` | ✅ OK | — |
 | `test_session_expiry` | ✅ OK | — |
-| `test_shared_subscriptions` | ✅ OK | — |
 | `test_basic` | ✅ OK | — |
 | `test_overlapping_subscriptions` | ✅ OK | — |
 | `test_redelivery_on_reconnect` | ✅ OK | — |
@@ -102,8 +101,8 @@ cargo build -p oximqtt-test --release
 | Memory | DDR3/2333, 128 GB |
 | Disk | 2 TB |
 | Container | Podman v4.4.1 |
-| MQTT Bench | `docker.io/zeaphoo/oximqtt-bench:latest` (v0.1.3) |
-| MQTT Broker | `docker.io/zeaphoo/oximqtt:latest` (v0.22.0) |
+| MQTT Bench | `rmqtt/rmqtt-bench:latest` (v0.1.3) |
+| MQTT Broker | `zeaphoo/oximqtt:latest` (v0.22.0) |
 
 *Note: MQTT Bench and MQTT Broker run on the same host.*
 
@@ -126,4 +125,4 @@ cargo build -p oximqtt-test --release
 
 ## License
 
-MIT OR Apache-2.0
+Apache-2.0

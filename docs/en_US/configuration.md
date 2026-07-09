@@ -31,12 +31,11 @@ Later sources override earlier ones:
 
 ---
 
-## `[node]` — Cluster Node
+## `[node]` — Node
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `id` | `u64` | `0` | Cluster node ID |
-| `cookie` | `String` | `"oximqttsecretcookie"` | Shared secret for cluster auth |
+| `id` | `u64` | `0` | Node ID |
 
 ### `[node.busy]` — Busy-state Detection
 
@@ -76,15 +75,15 @@ Later sources override earlier ones:
 Listeners are organized by protocol. Each protocol section is a map of named listeners:
 
 ```toml
-[listener.tcp.external]
-enable = true
-addr = "0.0.0.0:1883"
+## MQTT/TCP - External TCP Listener
+listener.tcp.external.addr = "0.0.0.0:1883"
+listener.tcp.external.max_connections = 1024000
+listener.tcp.external.allow_anonymous = true
 
-[listener.tls.internal]
-enable = true
-addr = "0.0.0.0:8883"
-cert = "/path/to/cert.pem"
-key = "/path/to/key.pem"
+## MQTT/TLS - External TLS Listener
+listener.tls.external.addr = "0.0.0.0:8883"
+listener.tls.external.cert = "./oximqtt-bin/oximqtt.pem"
+listener.tls.external.key = "./oximqtt-bin/oximqtt.key"
 ```
 
 Supported protocol sections: `listener.tcp`, `listener.tls`, `listener.ws`, `listener.wss`, `listener.quic`.

@@ -158,7 +158,7 @@ mosquitto_pub -h 127.0.0.1 -p 1883 -t "test/topic" -m "hello"
 
 ## Understanding Feature Flags
 
-The core library (`oximqtt`) has 4 feature flags for transport layers. All other functionality (delayed publish, retained messages, metrics, stats, shared subscriptions, etc.) is compiled unconditionally.
+The core library (`oximqtt`) has 4 feature flags for transport layers. All other functionality (delayed publish, retained messages, metrics, stats, etc.) is compiled unconditionally.
 
 ```bash
 # Build with default features (TLS + WebSocket + QUIC)

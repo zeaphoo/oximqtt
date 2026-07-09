@@ -27,7 +27,6 @@ oximqtt/src/
 ├── router.rs       — 基于主题的消息路由（publish、subscribe、unsubscribe、离线投递）
 ├── server.rs       — MqttServer（Builder：.listener()、.build()、.start()；连接接受循环）
 ├── session.rs      — 会话处理（~2400 行：连接、断开、订阅、发布、QoS 流程）
-├── shared.rs       — 共享订阅（$share/{group}/{topic}）
 ├── topic.rs        — 主题解析/验证（TopicFilter、parse_topic_filter、topic_size）
 ├── trie.rs         — 订阅匹配的 Trie 树
 ├── types.rs        — 核心类型（~3000 行：ConnectInfo、Publish、Packet、Reason、Id、SessionTx 等）
@@ -94,4 +93,4 @@ async fn main() -> Result<()> {
 
 ## 许可证
 
-MIT OR Apache-2.0
+Apache-2.0

@@ -87,4 +87,4 @@ Welcome to the OXIMQTT documentation. This index provides a structured overview 
 
 ## License
 
-OXIMQTT is licensed under [MIT](https://opensource.org/licenses/MIT) or [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) at your option.
+OXIMQTT is licensed under [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0).

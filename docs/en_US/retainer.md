@@ -33,15 +33,15 @@ retainer
 
 # The maximum number of retained messages, where 0 indicates no limit. After the number of reserved messages exceeds
 # the maximum limit, existing reserved messages can be replaced, but reserved messages cannot be stored for new topics.
-max_retained_messages = 0
+retainer.max_retained_messages = 0
 
 # The maximum Payload value for retaining messages. After the Payload size exceeds the maximum value, the OXIMQTT
 # message server will process the received reserved message as a regular message.
-max_payload_size = "1MB"
+retainer.max_payload_size = "1MB"
 
 # TTL for retained messages. Set to 0 for no expiration.
 # If not specified, the message expiration time will be used by default.
-retained_message_ttl = "0m"
+retainer.retained_message_ttl = "0m"
 ```
 
 The retainer built-in module uses in-memory (RAM) storage for retained messages.

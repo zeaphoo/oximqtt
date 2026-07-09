@@ -59,4 +59,4 @@ Loaded by `oximqtt::conf::Settings` from the following paths (in priority order)
 
 ## License
 
-MIT OR Apache-2.0
+Apache-2.0

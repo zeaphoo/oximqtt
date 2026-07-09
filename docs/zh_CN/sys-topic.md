@@ -27,13 +27,13 @@ oximqtt.toml 中的 [sys_topic] 配置段
 
 ```bash
 #$SYS system message publish QoS
-publish_qos = 1
+sys_topic.publish_qos = 1
 
 #$SYS system message publish period
-publish_interval = "1m"
+sys_topic.publish_interval = "1m"
 
 ##Message expiration time, 0 means no expiration
-message_expiry_interval = "5m"
+sys_topic.message_expiry_interval = "5m"
 ```
 
 <div style="width:100%;padding:15px;border-left:10px solid #1cc68b;background-color: #d1e3dd; color: #00b173;">

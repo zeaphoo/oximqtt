@@ -43,45 +43,45 @@ oximqtt.toml 中的 [auth_jwt] 配置段
 # See more keys and their definitions at https://github.com/zeaphoo/oximqtt/blob/master/docs/en_US/auth-jwt.md
 
 #Disconnect if publishing is rejected
-disconnect_if_pub_rejected = true
+auth_jwt.disconnect_if_pub_rejected = true
 
 ## From where the JWT string can be got
 ## Value: username | password
 ## Default: password
-from = "password"
+auth_jwt.from = "password"
 
 ## Encryption method
 ## Value: hmac-based | public-key
 ## Default: hmac-based
-encrypt = "hmac-based"
+auth_jwt.encrypt = "hmac-based"
 
 ## HMAC Hash Secret.
 ##
 ## Value: String
-hmac_secret = "oximqttsecret"
-#hmac_secret = "cm1xdHRzZWNyZXQ="
+auth_jwt.hmac_secret = "oximqttsecret"
+#auth_jwt.hmac_secret = "cm1xdHRzZWNyZXQ="
 
 ## Secret Base64 Encode
 ##
 ## Value: true | false
 ## Default: false
-hmac_base64 = false
+auth_jwt.hmac_base64 = false
 
 ## RSA or ECDSA public key file.
 ##
 ## Value: File
-public_key = "./oximqtt-bin/jwt_public_key_rsa.pem"
+auth_jwt.public_key = "./oximqtt-bin/jwt_public_key_rsa.pem"
 
 ## Disconnect After Expiration
 ##
 ## Value: true | false
 ## Default: false
-disconnect_if_expiry = false
+auth_jwt.disconnect_if_expiry = false
 
 ## The checklist of claims to validate
 ##
 ## Value: String
-## validate_claims.$name = expected
+## auth_jwt.validate_claims.$name = expected
 ##
 ## Placeholder:
 ##  - ${username}: username
@@ -91,21 +91,21 @@ disconnect_if_expiry = false
 
 ### Basic Validation
 ## > Validate the token's expiration by comparing the exp claim to the current UTC time.
-validate_claims.exp = true
+auth_jwt.validate_claims.exp = true
 ## < Ensure the token is not used before its nbf claim.
-#validate_claims.nbf = true
+#auth_jwt.validate_claims.nbf = true
 ## Ensure the token's subject (sub claim) is as expected.
-#validate_claims.sub = "user@oximqtt.com"
+#auth_jwt.validate_claims.sub = "user@oximqtt.com"
 ## Validate the token's issuer by comparing the iss claim to the known issuer.
-#validate_claims.iss = ["https://oximqtt.com1", "https://oximqtt.com"]
+#auth_jwt.validate_claims.iss = ["https://oximqtt.com1", "https://oximqtt.com"]
 ## Verify that the token's audience (aud claim) matches the intended recipient.
-#validate_claims.aud = ["https://your-api.com", "mobile_app", "web_app"]
+#auth_jwt.validate_claims.aud = ["https://your-api.com", "mobile_app", "web_app"]
 
 ### Extended Validation
-#validate_claims.clientid = "${clientid}"
-#validate_claims.username = "${username}"
-#validate_claims.ipaddr = "${ipaddr}"
-#validate_claims.protocol = "${protocol}"
+#auth_jwt.validate_claims.clientid = "${clientid}"
+#auth_jwt.validate_claims.username = "${username}"
+#auth_jwt.validate_claims.ipaddr = "${ipaddr}"
+#auth_jwt.validate_claims.protocol = "${protocol}"
 
 ```
 

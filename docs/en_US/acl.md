@@ -37,7 +37,7 @@ ACL rule is checked.
 The rules file is described in Toml syntax:
 
 ```toml
-rules = [
+acl.rules = [
     # Allow "dashboard" users to subscribe to "$SYS/#" topics
     ["allow", { user = "dashboard" }, "subscribe", ["$SYS/#"]],
     # Allow client with IP address "127.0.0.1" to publish/subscribe to "$SYS/#" or "#" topics.

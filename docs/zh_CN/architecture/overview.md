@@ -119,10 +119,9 @@ oximqtt/src/
 ├── extend.rs        # 扩展点存储 (10 个 RwLock 插槽)
 ├── executor.rs      # 异步任务执行器包装
 ├── types.rs         # 核心数据类型 (~3000 行)
-├── node.rs          # 集群节点协调，gRPC 服务
+├── node.rs          # 节点标识与繁忙状态检测
 ├── acl.rs           # ACL 类型和 trait 定义
 ├── args.rs          # 命令行参数结构体
-├── shared.rs        # 共享订阅 ($share/)
 ├── delayed.rs       # 延迟发布
 ├── metrics.rs       # 指标收集
 ├── builtins/        # 内置模块 (acl, auth_jwt, retainer, sys_topic)
@@ -225,7 +224,6 @@ pub trait Handler: Send + Sync {
 | `SessionUnsubscribed` | 订阅已移除 | Continue |
 | `OfflineMessage` | 离线消息已存储 | Continue |
 | `OfflineInflightMessages` | 重连客户端加载 in-flight 消息 | Continue |
-| `GrpcMessageReceived` | 跨节点 gRPC 消息 | `(bool, Option<Vec<u8>>)` |
 
 ### 钩子注册优先级
 
@@ -348,4 +346,4 @@ MQTT 编解码使用状态机模式：
 
 ## 许可证
 
-MIT OR Apache-2.0
+Apache-2.0

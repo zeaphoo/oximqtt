@@ -136,12 +136,11 @@ oximqtt/src/
 ├── executor.rs      # Async task executor wrapper
 │
 ├── types.rs         # Core data types (~3000 lines)
-├── node.rs          # Cluster node coordination, gRPC server
+├── node.rs          # Node identity and busy-state detection
 │
 ├── acl.rs           # ACL types and trait definitions
 │
 ├── args.rs          # Command-line argument struct
-├── shared.rs        # Shared subscriptions ($share/)
 │
 ├── delayed.rs       # Delayed publish
 ├── metrics.rs       # Metrics collection
@@ -245,7 +244,6 @@ pub trait Handler: Send + Sync {
 | `SessionUnsubscribed` | Subscription removed | Continue |
 | `OfflineMessage` | Offline message stored | Continue |
 | `OfflineInflightMessages` | Reconnecting client loads in-flight messages | Continue |
-| `GrpcMessageReceived` | Cross-node gRPC message | `(bool, Option<Vec<u8>>)` |
 
 ### Hook Registration Priority
 
@@ -368,4 +366,4 @@ The MQTT codec uses a state machine pattern:
 
 ## License
 
-MIT OR Apache-2.0
+Apache-2.0

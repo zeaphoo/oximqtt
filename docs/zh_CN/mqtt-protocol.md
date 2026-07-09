@@ -44,8 +44,6 @@ OXIMQTT 支持以下 MQTT 协议版本，并严格遵循官方规范，确保客
 
 * 服务器返回 **SUBACK** 报文，确认订阅结果，包括每个主题的订阅状态码。
 
-* 支持 **共享订阅（Shared Subscription）**，多个客户端可共同消费同一主题消息。
-
 ### 3.2 取消订阅（UNSUBSCRIBE）
 
 * 客户端可取消对一个或多个主题的订阅。
@@ -110,8 +108,6 @@ OXIMQTT 支持以下 MQTT 协议版本，并严格遵循官方规范，确保客
     * `+`：单层通配符，匹配一层主题
     * `#`：多层通配符，匹配该层及子层主题
 
-* 支持共享订阅主题格式 `$share/<group>/<topic>`
-
 ---
 
 ## 8. MQTT 5.0 新特性
@@ -123,7 +119,6 @@ OXIMQTT 支持以下 MQTT 协议版本，并严格遵循官方规范，确保客
 * **服务器参考（Server Reference）**
 * **最大消息大小（Maximum Packet Size）**
 * **请求响应模式（Request/Response Pattern）**
-* **共享订阅（Shared Subscription）**
 * **增强错误码与原因码（Reason Codes）**：更精细的操作反馈
 
 ---

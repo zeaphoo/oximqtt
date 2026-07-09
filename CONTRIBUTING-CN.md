@@ -291,4 +291,4 @@ cargo build --release
 
 ## 许可证
 
-向 OXIMQTT 贡献代码即表示你同意你的贡献将按照 [MIT](LICENSE-MIT) 或 [Apache 2.0](LICENSE-APACHE) 许可证（由你选择）进行许可。
+向 OXIMQTT 贡献代码即表示你同意你的贡献将按照 [Apache 2.0](LICENSE) 许可证进行许可。

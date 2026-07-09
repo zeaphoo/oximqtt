@@ -56,7 +56,7 @@ All configuration is in a single `oximqtt.toml` file. Key sections:
 | `[retainer]` | Retained message storage |
 | `[auth_jwt]` | JWT authentication |
 | `[sys_topic]` | System topic publishing |
-| `[node]` | Node identity and cluster settings |
+| `[node]` | Node identity |
 | `[log]` | Logging configuration |
 | `[mqtt]` | Protocol limits |
 
@@ -87,9 +87,10 @@ These are default ports. Configure them in `oximqtt.toml` under `[listener.*]` s
 
 ## Credits
 
+- This project was originally simplified, organized, and redesigned from [RMQTT](https://github.com/rmqtt/rmqtt).
 - From version 0.15, the MQTT codec implementation is partially inspired by and derived from ntex-mqtt.
 - Versions 0.13 and earlier relied on maintained forked versions of the ntex and ntex-mqtt crates.
 
 ## License
 
-Licensed under either of [MIT](LICENSE-MIT) or [Apache 2.0](LICENSE-APACHE) at your option.
+Licensed under the [Apache 2.0](LICENSE) license.

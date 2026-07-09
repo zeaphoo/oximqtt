@@ -46,7 +46,6 @@ cd paho.mqtt.testing/interoperability
 | `test_dollar_topics` | ✅ 通过 |
 | `test_unsubscribe` | ✅ 通过 |
 | `test_session_expiry` | ✅ 通过 |
-| `test_shared_subscriptions` | ✅ 通过 |
 | `test_basic` | ✅ 通过 |
 | `test_overlapping_subscriptions` | ✅ 通过 |
 | `test_redelivery_on_reconnect` | ✅ 通过 |
@@ -102,7 +101,7 @@ cargo build -p oximqtt-test --release
 | 内存 | DDR3/2333, 128 GB |
 | 磁盘 | 2 TB |
 | 容器 | Podman v4.4.1 |
-| 测试工具 | `zeaphoo/oximqtt-bench:latest` (v0.1.3) |
+| 测试工具 | `rmqtt/rmqtt-bench:latest` (v0.1.3) |
 | MQTT Broker | `zeaphoo/oximqtt:latest` (v0.22.0) |
 
 *测试客户端和 Broker 同机部署。*
@@ -126,4 +125,4 @@ cargo build -p oximqtt-test --release
 
 ## 许可证
 
-MIT OR Apache-2.0
+Apache-2.0

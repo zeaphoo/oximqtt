@@ -44,8 +44,6 @@ The server responds with a **CONNACK** packet, indicating the connection result,
 
 * The server responds with **SUBACK**, confirming the subscription result and return codes for each topic.
 
-* Supports **Shared Subscriptions**, allowing multiple clients to consume messages from the same topic collaboratively.
-
 ### 3.2 Unsubscribe (UNSUBSCRIBE)
 
 * Clients can unsubscribe from one or more topics.
@@ -110,8 +108,6 @@ The server responds with a **CONNACK** packet, indicating the connection result,
     * `+`: single-level wildcard, matches one topic level
     * `#`: multi-level wildcard, matches the current and all sub-levels
 
-* Shared subscription topic format: `$share/<group>/<topic>`
-
 ---
 
 ## 8. MQTT 5.0 New Features
@@ -123,7 +119,6 @@ The server responds with a **CONNACK** packet, indicating the connection result,
 * **Server Reference**
 * **Maximum Packet Size**
 * **Request/Response Pattern**
-* **Shared Subscription**
 * **Enhanced Reason Codes**: finer-grained operation feedback
 
 ---

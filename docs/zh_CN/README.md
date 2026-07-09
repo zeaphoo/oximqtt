@@ -86,4 +86,4 @@
 
 ## 许可证
 
-OXIMQTT 基于 [MIT](https://opensource.org/licenses/MIT) 或 [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) 许可证。
+OXIMQTT 基于 [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) 许可证。

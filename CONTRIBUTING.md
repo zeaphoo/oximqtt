@@ -298,4 +298,4 @@ Maintainers will review your PR for:
 
 ## License
 
-By contributing to OXIMQTT, you agree that your contributions will be licensed under the [MIT](LICENSE-MIT) or [Apache 2.0](LICENSE-APACHE) license, at your option.
+By contributing to OXIMQTT, you agree that your contributions will be licensed under the [Apache 2.0](LICENSE) license.

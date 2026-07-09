@@ -31,12 +31,11 @@ OXIMQTT 使用单一配置文件（`oximqtt.toml`），包含以下配置节。
 
 ---
 
-## `[node]` — 集群节点
+## `[node]` — 节点
 
 | 字段 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
-| `id` | `u64` | `0` | 集群节点 ID |
-| `cookie` | `String` | `"oximqttsecretcookie"` | 集群认证共享密钥 |
+| `id` | `u64` | `0` | 节点 ID |
 
 ### `[node.busy]` — 繁忙状态检测
 
@@ -76,15 +75,15 @@ OXIMQTT 使用单一配置文件（`oximqtt.toml`），包含以下配置节。
 监听器按协议分类，每个协议节下是命名监听器的映射：
 
 ```toml
-[listener.tcp.external]
-enable = true
-addr = "0.0.0.0:1883"
+## MQTT/TCP - 外部 TCP 监听器
+listener.tcp.external.addr = "0.0.0.0:1883"
+listener.tcp.external.max_connections = 1024000
+listener.tcp.external.allow_anonymous = true
 
-[listener.tls.internal]
-enable = true
-addr = "0.0.0.0:8883"
-cert = "/path/to/cert.pem"
-key = "/path/to/key.pem"
+## MQTT/TLS - 外部 TLS 监听器
+listener.tls.external.addr = "0.0.0.0:8883"
+listener.tls.external.cert = "./oximqtt-bin/oximqtt.pem"
+listener.tls.external.key = "./oximqtt-bin/oximqtt.key"
 ```
 
 支持的协议节：`listener.tcp`、`listener.tls`、`listener.ws`、`listener.wss`、`listener.quic`。

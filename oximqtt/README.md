@@ -27,7 +27,6 @@ oximqtt/src/
 ├── router.rs       — Topic-based message router (publish, subscribe, unsubscribe, route to offline)
 ├── server.rs       — MqttServer (builder: .listener(), .build(), .start(); accept loop)
 ├── session.rs      — Session handling (~2400 lines: connect, disconnect, subscribe, publish, QoS flow)
-├── shared.rs       — Shared subscriptions ($share/{group}/{topic})
 ├── topic.rs        — Topic parsing/validation (TopicFilter, parse_topic_filter, topic_size)
 ├── trie.rs         — Topic trie for subscription matching
 ├── types.rs        — Core types (~3000 lines: ConnectInfo, Publish, Packet, Reason, Id, SessionTx, etc.)
@@ -94,4 +93,4 @@ See `oximqtt/examples/` for: `simple`, `simple_tls`, `simple_ws`, `simple_wss`, 
 
 ## License
 
-MIT OR Apache-2.0
+Apache-2.0

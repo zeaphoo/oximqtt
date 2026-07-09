@@ -56,7 +56,7 @@ oximqtt = "0.22"
 | `[retainer]` | 保留消息存储 |
 | `[auth_jwt]` | JWT 认证 |
 | `[sys_topic]` | 系统主题发布 |
-| `[node]` | 节点标识和集群设置 |
+| `[node]` | 节点标识 |
 | `[log]` | 日志配置 |
 | `[mqtt]` | 协议限制 |
 
@@ -87,9 +87,10 @@ oximqtt = "0.22"
 
 ## Credits
 
+- 本项目最初是对 [RMQTT](https://github.com/rmqtt/rmqtt) 的精简、整理和重新设计。
 - 从 0.15 版本开始，本项目的 MQTT 编解码实现部分参考并借鉴了 ntex-mqtt 的实现。
 - 在 0.13 及之前的版本，本项目依赖了维护的 ntex 和 ntex-mqtt fork 版本作为依赖库。
 
 ## 许可证
 
-基于 [MIT](LICENSE-MIT) 或 [Apache 2.0](LICENSE-APACHE) 许可证。
+基于 [Apache 2.0](LICENSE) 许可证。

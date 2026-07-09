@@ -31,7 +31,7 @@ oximqtt.toml 中的 [acl] 配置段
 该规则文件以 Toml 语法的格式进行描述：
 
 ```toml
-rules = [
+acl.rules = [
     # 允许 "dashboard" 用户 订阅 "$SYS/#" 主题
     ["allow", { user = "dashboard" }, "subscribe", ["$SYS/#"]],
 
