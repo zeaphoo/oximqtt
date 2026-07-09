@@ -2132,8 +2132,7 @@ impl SessionSubs {
     pub async fn clear(&self, #[allow(unused_variables)] scx: &ServerContext) {
         {
             let subs = self.subs.read().await;
-            #[allow(unused_variables)]
-            for (_, opts) in subs.iter() {
+            for opts in subs.values() {
                 scx.stats.subscriptions.dec();
                 if opts.has_shared_group() {
                     scx.stats.subscriptions_shared.dec();
