@@ -1,6 +1,6 @@
 # OXIMQTT Broker
 
-[![GitHub Release](https://img.shields.io/github/release/oximqtt/oximqtt?color=brightgreen)](https://github.com/zeaphoo/oximqtt/releases)
+[![GitHub Release](https://img.shields.io/github/release/zeaphoo/oximqtt?color=brightgreen)](https://github.com/zeaphoo/oximqtt/releases)
 [![Rust Version](https://img.shields.io/badge/rust-1.89.0%2B-blue)](https://blog.rust-lang.org/2025/08/07/Rust-1.89.0/)
 [![crates.io](https://img.shields.io/crates/v/oximqtt.svg)](https://crates.io/crates/oximqtt)
 [![docs.rs](https://docs.rs/oximqtt/badge.svg)](https://docs.rs/oximqtt/latest/oximqtt/)
@@ -82,6 +82,8 @@ See [Configuration Guide](docs/en_US/configuration.md) for all options.
 | 8883 | MQTT over TLS |
 | 8080 | MQTT over WebSocket |
 | 8443 | MQTT over WebSocket-TLS |
+
+These are default ports. Configure them in `oximqtt.toml` under `[listener.*]` sections. See [Configuration Guide](docs/en_US/configuration.md#listener--network-listeners) for details.
 
 ## Credits
 

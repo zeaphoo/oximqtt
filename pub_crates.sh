@@ -12,7 +12,4 @@ publish() {
 # oximqtt (contains codec, net, utils, conf)
 publish oximqtt
 
-# oximqtt-bin -> oximqtt
-publish oximqtt-bin
-
 echo ">>> All crates published."
