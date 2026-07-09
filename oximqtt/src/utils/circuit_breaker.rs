@@ -3,18 +3,18 @@
 //! ## State Machine
 //!
 //! ```text
-//!                record_failure() ≥ threshold
-//!     CLOSED ──────────────────────────────────► OPEN
-//!       ▲                                          │
-//!       │                     reset_timeout elapsed │
-//!       │                                          ▼
-//!       │                                  ┌──────────────┐
-//!       │         record_success()         │  HALF_OPEN    │
-//!       ◄──────────────── (≥ threshold) ───│ (probe phase) │
-//!                                          └──────┬───────┘
-//!                                     reset_timeout │ (probe stuck)
-//!                                                   ▼
-//!                                                OPEN
+//!                record_failure() >= threshold
+//!     CLOSED ---------------------------------------> OPEN
+//!       ^                                              |
+//!       |                       reset_timeout elapsed  |
+//!       |                                              v
+//!       |                                    +--------------+
+//!       |         record_success()           |  HALF_OPEN   |
+//!       <----------------- (>= threshold) ---| (probe phase)|
+//!                                            +------+-------+
+//!                                   reset_timeout | (probe stuck)
+//!                                                 v
+//!                                              OPEN
 //! ```
 //!
 //! - **CLOSED**: Normal operation. Counts consecutive failures.
@@ -124,7 +124,7 @@ impl Default for CircuitBreakerConfig {
 /// A lock-free, thread-safe circuit breaker for fast-fail degradation.
 ///
 /// All state transitions are atomic; no locks or wait mechanisms are used.
-/// See the [module-level documentation](self) for the state machine description
+/// See the [module-level documentation](super) for the state machine description
 /// and usage example.
 pub struct CircuitBreaker {
     state: AtomicU8,

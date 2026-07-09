@@ -12,14 +12,16 @@
 //!
 //! Architecture:
 //!
+//! ```text
 //!                  TCP
 //!                   |
 //!            reader task
 //!                   |   writes PUBACK/PUBREC/PUBCOMP
 //!                   |
-//!        ┌──────────┴──────────┐
-//!        │                     │
+//!        +----------+----------+
+//!        |                     |
 //!   publish channel      ack router
+//! ```
 //!
 //! Only ONE task reads from socket.
 

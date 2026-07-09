@@ -140,7 +140,7 @@ pub trait RetainStorage: Sync + Send {
     /// What type of retain synchronization this storage requires from the
     /// cluster plugin when [`retain_set_broadcast`] is called.
     ///
-    /// [`retain_set_broadcast`]: crate::shared::ClusterShared::retain_set_broadcast
+    /// [`retain_set_broadcast`]: crate::shared::Shared::retain_set_broadcast
     #[inline]
     fn retain_sync_mode(&self) -> RetainSyncMode {
         RetainSyncMode::Full

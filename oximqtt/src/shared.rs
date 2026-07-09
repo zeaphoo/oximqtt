@@ -286,7 +286,7 @@ pub trait Shared: Sync + Send {
     }
 
     /// Mark a message as successfully forwarded to the given subscribers.
-    /// Delegates to [`MessageManager::mark_forwarded`] so that forwarding
+    /// Delegates to [`crate::message::MessageManager::mark_forwarded`] so that forwarding
     /// results are persisted and subsequent `get()` calls will not redeliver
     /// the same message to these clients.
     ///

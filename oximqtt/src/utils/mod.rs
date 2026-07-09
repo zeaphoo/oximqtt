@@ -1,13 +1,12 @@
 //! Utilities module providing essential types and functions for common system operations
 //!
 //! ## Core Features:
-//! - **Byte Size Handling**: Human-readable byte size parsing/formatting with [`Bytesize`]
+//! - **Byte Size Handling**: Human-readable byte size parsing/formatting with `Bytesize`
 //! - **Duration Conversion**: String-to-Duration parsing supporting multiple time units
 //! - **Timestamp Utilities**: Precise timestamp handling with millisecond resolution
-//! - **Network Addressing**: Cluster node address parsing ([`NodeAddr`]) and socket address handling
-//! - **Counter Implementation**: Thread-safe counter with merge modes ([`Counter`])
-//! - **Circuit Breaker**: Lock-free fast-fail degradation for external service calls ([`CircuitBreaker`])
-//!
+//! - **Network Addressing**: Cluster node address parsing (`NodeAddr`) and socket address handling
+//! - **Counter Implementation**: Thread-safe counter with merge modes (`Counter`)
+//! - **Circuit Breaker**: Lock-free fast-fail degradation for external service calls (`CircuitBreaker`)
 //! ## Key Components:
 //! - `Bytesize`: Handles 2G512M-style conversions with serialization support
 //! - Time functions: `timestamp_secs()`, `format_timestamp_now()`, and datetime parsing

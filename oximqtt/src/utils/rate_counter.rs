@@ -164,9 +164,9 @@ impl RateCounter {
         self.total.load(Ordering::Relaxed)
     }
 
-    /// Returns the per-second rate computed by the most recent [`tick`].
+    /// Returns the per-second rate computed by the most recent [`Self::tick`].
     ///
-    /// Returns `0.0` if [`tick`] has never been called.
+    /// Returns `0.0` if [`Self::tick`] has never been called.
     #[inline]
     pub fn speed(&self) -> f64 {
         f64::from_bits(self.speed.load(Ordering::Relaxed))

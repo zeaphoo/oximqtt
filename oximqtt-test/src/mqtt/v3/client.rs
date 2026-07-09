@@ -11,13 +11,15 @@
 //!
 //! Architecture:
 //!
+//! ```text
 //!                  TCP
 //!                   |
 //!            reader task
 //!                   |
-//!        ┌──────────┴──────────┐
-//!        │                     │
+//!        +----------+----------+
+//!        |                     |
 //!   publish channel      ack router
+//! ```
 //!
 //! Only ONE task reads from socket.
 

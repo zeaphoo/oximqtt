@@ -790,7 +790,7 @@ impl HookManager for DefaultHookManager {
 ///
 /// Uses a [`DashSet`] to maintain a set of `(Type, (Priority, HandlerId))`
 /// tuples. On `start`/`stop`, iterates over the set and toggles the
-/// `enabled` flag on each entry's [`HookEntry`].
+/// `enabled` flag on each `HookEntry`.
 pub struct DefaultHookRegister {
     manager: DefaultHookManager,
     type_ids: Arc<DashSet<(Type, (Priority, HandlerId))>>,

@@ -24,14 +24,14 @@
 //! ## Architectural Components
 //! ```text
 //! SessionState
-//! ├── Online Mode
-//! │   ├── Real-time message delivery
-//! │   ├── Keep-alive management
-//! │   └── QoS handshake handling
-//! └── Offline Mode
-//!     ├── Message persistence
-//!     ├── Delayed will messages
-//!     └── Session state preservation
+//! |-- Online Mode
+//! |   |-- Real-time message delivery
+//! |   |-- Keep-alive management
+//! |   +-- QoS handshake handling
+//! +-- Offline Mode
+//!     |-- Message persistence
+//!     |-- Delayed will messages
+//!     +-- Session state preservation
 //! ```
 //!
 //! ## Key Mechanisms
@@ -2201,7 +2201,7 @@ impl std::fmt::Debug for OfflineInfo {
 
 /// Default implementation of [`SessionManager`] for production use.
 ///
-/// Relies on the broker's [`Shared`] state for session storage and
+/// Relies on the broker's shared state for session storage and
 /// retrieval. Session creation and resumption are delegated to the
 /// cluster-wide shared session infrastructure.
 pub struct DefaultSessionManager;
