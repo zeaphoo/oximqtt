@@ -74,7 +74,7 @@ use oximqtt::Result;
 async fn main() -> Result<()> {
     let scx = ServerContext::new().build().await;
 
-    // 初始化内置模块（需要 "full" feature）
+    // 初始化内置模块
     oximqtt::builtins::init_all(&scx).await?;
 
     MqttServer::new(scx)

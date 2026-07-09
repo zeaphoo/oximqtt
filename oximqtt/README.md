@@ -74,7 +74,7 @@ use oximqtt::Result;
 async fn main() -> Result<()> {
     let scx = ServerContext::new().build().await;
 
-    // Initialize built-in modules (requires "full" feature)
+    // Initialize built-in modules
     oximqtt::builtins::init_all(&scx).await?;
 
     MqttServer::new(scx)

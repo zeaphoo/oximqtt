@@ -37,7 +37,7 @@ $ chmod +x bin/oximqttd
 
 ```bash
 $ cd /app/oximqtt
-$ sh start.sh
+$ ./bin/oximqttd -f ./etc/oximqtt.toml
 ```
 
 5. Check the service

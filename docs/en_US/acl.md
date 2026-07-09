@@ -96,12 +96,7 @@ The rules in the `[acl]` section of `oximqtt.toml` are matched from top to botto
     - `{allow, all}`: Allow all operations
     - `{deny, all}`: Deny all operations
 
-After the `[acl]` configuration in `oximqtt.toml` is modified, it will not be automatically loaded into the OXIMQTT Broker system,
-but needs to be performed manually:
-
-```bash
-curl -X PUT "http://127.0.0.1:6060/api/v1/builtins/acl/config/reload"
-```
+After the `[acl]` configuration in `oximqtt.toml` is modified, restart the broker for changes to take effect.
 
 ## Placeholders
 

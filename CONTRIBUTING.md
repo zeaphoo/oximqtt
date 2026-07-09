@@ -96,15 +96,6 @@ cargo build --release
 cargo build -p oximqttd
 ```
 
-### Code Generation
-
-Some code is auto-generated at build time:
-
-```bash
-# Plugin registration code (generated from Cargo.toml metadata)
-# Done automatically by oximqtt-bin/build.rs — no manual step needed
-```
-
 ## Code Style
 
 ### Formatting

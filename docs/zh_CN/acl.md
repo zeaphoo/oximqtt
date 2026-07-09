@@ -88,11 +88,7 @@ acl.rules = [
     - `{allow, all}`：允许所有操作
     - `{deny, all}`：拒绝所有操作
 
-在 `[acl]` 配置修改完成后，并不会自动加载至 OXIMQTT 系统。需要手动执行：
-
-```bash
-curl -X PUT "http://127.0.0.1:6060/api/v1/builtins/acl/config/reload"
-```
+在 `[acl]` 配置修改完成后，需要重启 Broker 使更改生效。
 
 ## 占位符
 

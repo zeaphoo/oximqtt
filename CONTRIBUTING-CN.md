@@ -96,15 +96,6 @@ cargo build --release
 cargo build -p oximqttd
 ```
 
-### 代码生成
-
-部分代码在构建时自动生成：
-
-```bash
-# 插件注册代码（从 Cargo.toml 元数据自动生成）
-# 由 oximqtt-bin/build.rs 自动完成 — 无需手动操作
-```
-
 ## 代码风格
 
 ### 格式化
