@@ -99,7 +99,7 @@ The workspace is organized into these layers:
 
 ### Built-in Modules
 
-The following modules were previously separate plugin crates and have been merged into the `oximqtt` core crate as built-in modules. They are configured directly in `oximqtt.toml` under their respective sections:
+The following built-in modules are part of the `oximqtt` core crate. They are configured directly in `oximqtt.toml` under their respective sections:
 
 | Module | Config Section | Responsibility |
 |--------|---------------|----------------|
@@ -253,7 +253,7 @@ Handlers can register with a priority. Lower values execute first.
 
 ## Built-in Modules
 
-> **Note:** The plugin system has been removed. The four previously separate plugin crates (oximqtt-acl, oximqtt-auth-jwt, oximqtt-retainer, oximqtt-sys-topic) have been merged into the `oximqtt` core crate as built-in modules. They are configured directly in `oximqtt.toml` under their respective sections (`[acl]`, `[auth_jwt]`, `[retainer]`, `[sys_topic]`). The `oximqtt-plugins/` directory no longer exists.
+The built-in modules (ACL, JWT auth, retainer, sys_topic) are configured directly in `oximqtt.toml` under their respective sections (`[acl]`, `[auth_jwt]`, `[retainer]`, `[sys_topic]`).
 
 The hook system remains available for extending broker functionality. Built-in modules register their handlers through the same hook system during server initialization.
 

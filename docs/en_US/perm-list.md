@@ -4,10 +4,9 @@ English | [简体中文](../zh_CN/perm-list.md)
 # Access Control List (Optional)
 
 *OXIMQTT* allows for pre-setting permissions for clients during the authentication phase, which is used to control publish 
-and subscribe permission checks after the client logs in. Currently, both JWT authentication and HTTP authentication 
-support 'permission presets,' using an access control list (ACL) as an optional extension of the authentication result. 
-For example, this can be the private claim `acl` defined in the JWT or the `acl` JSON attribute returned as part of the 
-HTTP authentication response. The publish and subscribe actions after the client connects will be subject to these ACL rules.
+and subscribe permission checks after the client logs in. Currently, JWT authentication supports 'permission presets,' 
+using an access control list (ACL) as an optional extension of the authentication result. For example, this can be the 
+private claim `acl` defined in the JWT. The publish and subscribe actions after the client connects will be subject to these ACL rules.
 
 This page introduces the ACL rules for pre-setting client permissions. Authorizing clients using the ACL rules included 
 in the authentication response is concise and efficient, and is typically sufficient for most use cases.

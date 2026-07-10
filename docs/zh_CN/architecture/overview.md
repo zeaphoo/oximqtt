@@ -233,7 +233,7 @@ pub trait Handler: Send + Sync {
 
 ## 内置模块
 
-> **注意：** 插件系统已移除。原有的四个独立插件 crate（oximqtt-acl、oximqtt-auth-jwt、oximqtt-retainer、oximqtt-sys-topic）已合并到 `oximqtt` 核心 crate 中作为内置模块。它们直接在 `oximqtt.toml` 中通过各自的配置段（`[acl]`、`[auth_jwt]`、`[retainer]`、`[sys_topic]`）进行配置。`oximqtt-plugins/` 目录不再存在。
+内置模块（ACL、JWT 认证、保留消息、系统主题）直接在 `oximqtt.toml` 中通过各自的配置段（`[acl]`、`[auth_jwt]`、`[retainer]`、`[sys_topic]`）进行配置。
 
 钩子系统仍可用于扩展 Broker 功能。内置模块在服务器初始化期间通过相同的钩子系统注册处理器。
 

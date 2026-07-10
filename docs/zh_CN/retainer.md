@@ -4,9 +4,7 @@
 
 客户端发布消息时设置了**retain**标记，消息将被保留。然后当客户端订阅此消息匹配的主题过滤器时，将收到此保留消息。
 
-**OXIMQTT 0.4.0**及之后版本默认将关闭**保留消息**功能。开始**保留消息**功能需要启用**retainer**内置模块和**listener.tcp.\<xxxx\>.retain_available**配置项。
-
-注意：**OXIMQTT 0.11.0**及之后版本已经移除：**listener.tcp.\<xxxx\>.retain_available**配置项
+**保留消息**功能由 **retainer** 内置模块管理。在 `oximqtt.toml` 中添加 `[retainer]` 配置段即可启用。
 
 #### 内置模块：
 

@@ -181,7 +181,7 @@ When adding a new transport feature:
 
 ## Working with Built-in Modules
 
-The four previously separate plugin crates (oximqtt-acl, oximqtt-auth-jwt, oximqtt-retainer, oximqtt-sys-topic) have been merged into the `oximqtt` core crate as built-in modules. They are configured directly in `oximqtt.toml` under their respective sections:
+The built-in modules (ACL, JWT auth, retainer, sys_topic) are part of the `oximqtt` core crate. They are configured directly in `oximqtt.toml` under their respective sections:
 
 - `[acl]` — File-based ACL rules
 - `[auth_jwt]` — JWT authentication
@@ -231,6 +231,6 @@ All new features and changes must include:
 1. **Code documentation** — `///` doc comments on all public API items
 2. **Module-level docs** — `//!` at the top of each module explaining its purpose
 3. **README updates** — Update the corresponding README.md and README-CN.md
-4. **Feature docs** — If adding a plugin or significant feature, add a doc in `docs/en_US/` and `docs/zh_CN/`
+4. **Feature docs** — If adding a significant feature, add a doc in `docs/en_US/` and `docs/zh_CN/`
 
 See [CONTRIBUTING.md](../../CONTRIBUTING.md) for the full contribution guide.

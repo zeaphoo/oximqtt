@@ -133,7 +133,7 @@ disconnected 事件消息的 Payload 解析成 JSON 格式如下:
   "ipaddress": "127.0.0.1:1883",
   "clientid": "oximqtt-12312431wewr232",
   "username": "foo",
-  "topic": "foo/#"
+  "topic": "foo/#",
   "opts": { "qos":1 },
   "time": "2023-08-15 11:11:46.984"
 }

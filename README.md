@@ -82,6 +82,7 @@ See [Configuration Guide](docs/en_US/configuration.md) for all options.
 | 8883 | MQTT over TLS |
 | 8080 | MQTT over WebSocket |
 | 8443 | MQTT over WebSocket-TLS |
+| 9443 | MQTT over QUIC |
 
 These are default ports. Configure them in `oximqtt.toml` under `[listener.*]` sections. See [Configuration Guide](docs/en_US/configuration.md#listener--network-listeners) for details.
 

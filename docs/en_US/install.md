@@ -124,7 +124,7 @@ listener.tls.external.key = "/app/oximqtt/etc/oximqtt.key"
 
 ```bash
 $ cd /app/oximqtt
-./bin/oximqttd -f "./etc/oximqtt.toml"
+$ ./bin/oximqttd -f "./etc/oximqtt.toml"
 ```
 
 

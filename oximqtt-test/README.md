@@ -99,7 +99,7 @@ The program will auto-locate `target/release/oximqttd` and start the broker.
 |------|-------------|
 | `connect_v5` | MQTT 5.0 connect/disconnect |
 | `connect_v5_reason_codes` | V5 Reason Code verification |
-| `pubsub_v5_qos0` | Qos 0 publish/subscribe |
+| `pubsub_v5_qos0` | QoS 0 publish/subscribe |
 | `pubsub_v5_qos1` | QoS 1 publish/subscribe |
 | `pubsub_v5_qos2` | QoS 2 publish/subscribe |
 

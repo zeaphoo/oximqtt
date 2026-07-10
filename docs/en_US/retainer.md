@@ -7,10 +7,7 @@ English | [简体中文](../zh_CN/retainer.md)
 When the client sets the **retain** flag while publishing a message, the message will be retained.
 Then, when the client subscribes to a topic filter that matches this message, the retained message will be received.
 
-Starting from **OXIMQTT 0.4.0**, the **Retain Message** feature will be disabled by default.
-Enabling the **Retain Message** feature requires activating the **retainer** built-in module and configuring the **listener.tcp.\<xxxx\>.retain_available** option.
-
-**Note:** Starting from **OXIMQTT 0.11.0**, the configuration item **listener.tcp.\<xxxx\>.retain_available** has been **removed**.
+The **Retain Message** feature is managed by the **retainer** built-in module. Enable it by adding a `[retainer]` section to `oximqtt.toml`.
 
 #### Built-in Module:
 

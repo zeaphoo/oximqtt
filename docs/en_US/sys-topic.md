@@ -134,7 +134,7 @@ By default, OXIMQTT only allows MQTT clients from the local machine to subscribe
   "ipaddress": "127.0.0.1:1883",
   "clientid": "oximqtt-12312431wewr232",
   "username": "foo",
-  "topic": "foo/#"
+  "topic": "foo/#",
   "opts": { "qos":1 },
   "time": "2023-08-15 11:11:46.984"
 }

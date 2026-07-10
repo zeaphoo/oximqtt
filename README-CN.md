@@ -82,6 +82,7 @@ oximqtt = "0.22"
 | 8883 | MQTT over TLS |
 | 8080 | MQTT over WebSocket |
 | 8443 | MQTT over WebSocket-TLS |
+| 9443 | MQTT over QUIC |
 
 以上为默认端口，可在 `oximqtt.toml` 的 `[listener.*]` 配置段中修改。详见[配置指南](docs/zh_CN/configuration.md#listener--网络监听器)。
 
