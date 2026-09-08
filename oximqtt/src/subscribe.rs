@@ -93,12 +93,55 @@ pub trait SharedSubscription: Sync + Send {
 
 /// Default shared subscription implementation using round-robin selection.
 ///
-/// Note: This is a best-effort single-node round-robin. For true round-robin
-/// across cluster nodes, use the `oximqtt-shared-subscription` plugin.
+/// Best-effort single-node round-robin over the candidate subscribers,
+/// preferring online members. For cluster-aware strategies
+/// (sticky/hash/queue), replace via `Extends::set_shared_subscription`.
 pub struct DefaultSharedSubscription;
 
+/// Monotonic sequence used to rotate member selection per message.
+static SHARED_SUB_SEQ: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+
 #[async_trait]
-impl SharedSubscription for DefaultSharedSubscription {}
+impl SharedSubscription for DefaultSharedSubscription {
+    #[inline]
+    fn is_supported(&self, _listen_cfg: &ListenerConfig) -> bool {
+        true
+    }
+
+    /// Round-robin selection: rotate a global counter over the candidates,
+    /// skipping offline members when an online one is available. If every
+    /// member is offline, deliver to the rotated member so the message is
+    /// queued in its session (subject to expiry/offline limits).
+    async fn choice(
+        &self,
+        _scx: &ServerContext,
+        _group: &SharedGroup,
+        _publisher_id: &Id,
+        _topic: &TopicName,
+        ncs: &[(
+            NodeId,
+            ClientId,
+            SubscriptionOptions,
+            Option<Vec<SubscriptionIdentifier>>,
+            Option<IsOnline>,
+        )],
+    ) -> Option<(usize, IsOnline)> {
+        let len = ncs.len();
+        if len == 0 {
+            return None;
+        }
+        let seq = SHARED_SUB_SEQ.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+        let start = (seq % len as u64) as usize;
+        for i in 0..len {
+            let idx = (start + i) % len;
+            if matches!(ncs[idx].4, Some(true)) {
+                return Some((idx, true));
+            }
+        }
+        let idx = start;
+        Some((idx, ncs[idx].4.unwrap_or(false)))
+    }
+}
 
 /// Defines auto-subscription behavior for newly connected clients.
 ///

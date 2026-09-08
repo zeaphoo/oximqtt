@@ -143,10 +143,13 @@ If no TCP/TLS listeners are configured, a default TCP listener on `0.0.0.0:1883`
 
 ## `[acl]` — Access Control
 
+> Enabled by default; the section (and every field in it) is optional. With no `[acl]`
+> section the broker applies the built-in default rule set shown below.
+
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `disconnect_if_pub_rejected` | `bool` | `true` | Disconnect on publish rejection |
-| `rules` | array | `[]` | Ordered ACL rules |
+| `rules` | array | built-in | Ordered ACL rules; default allows `dashboard` user and `127.0.0.1` on `$SYS`, denies anonymous wildcard subscription of `$SYS/#`, then allows all |
 
 Rule format: `["allow"|"deny", {user="..."} | "all", "pubsub"|"publish"|"subscribe", ["topic/pattern/#"]]`
 
@@ -154,15 +157,30 @@ Rule format: `["allow"|"deny", {user="..."} | "all", "pubsub"|"publish"|"subscri
 
 ## `[retainer]` — Retained Messages
 
+> Retained-message storage is a core MQTT capability: it is **always enabled**, even with
+> no `[retainer]` section (in-memory storage, fields fall back to the defaults below).
+> The count cap is **bounded by default on purpose** — the store lives in RAM, so an
+> unbounded default would turn runaway retained-topic publishing into an
+> out-of-memory risk that must not depend on the operator remembering to configure it.
+> When the cap is reached, refreshing an already-retained topic still succeeds (it
+> consumes no new slot); only retained messages for brand-new topics are dropped and a
+> warning is logged. Set `0` explicitly to opt out of the limit.
+
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `max_retained_messages` | `usize` | `0` | Max retained messages; `0` = unlimited |
+| `max_retained_messages` | `usize` | `10000` | Max distinct topics holding a retained message; explicit `0` = unlimited |
 | `max_payload_size` | bytesize | `"1MB"` | Max payload size |
 | `retained_message_ttl` | duration | `"0m"` | TTL; `0` = no expiry |
 
 ---
 
 ## `[auth_jwt]` — JWT Authentication
+
+> The whole section is optional: when it is absent from the configuration, JWT
+> authentication is disabled entirely. When the section is present (even if empty), the
+> module is enabled and every field falls back to the documented default below, so you
+> only need to write the values you want to change. In production, always override
+> `hmac_secret` (a warning is logged when the built-in default is used).
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -177,6 +195,12 @@ Rule format: `["allow"|"deny", {user="..."} | "all", "pubsub"|"publish"|"subscri
 ---
 
 ## `[sys_topic]` — System Topics
+
+> Enabled by default like `[acl]`/`[retainer]`: with no `[sys_topic]` section the module
+> still runs using the defaults below ($SYS stats/metrics every minute plus client
+> lifecycle events). Exposure is gated by the default ACL rules, which restrict `$SYS/**`
+> subscription to the `dashboard` user and `127.0.0.1`. The section is optional and only
+> tunes interval/QoS/expiry; it does not offer an on/off switch.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|

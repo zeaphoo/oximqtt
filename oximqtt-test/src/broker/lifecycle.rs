@@ -23,6 +23,10 @@ pub struct BrokerProcess {
     addr: String,
     /// Config file path (optional)
     config_path: Option<PathBuf>,
+    /// Working directory for the broker process (optional).
+    /// The broker also auto-discovers `./oximqtt.toml` relative to CWD, so an
+    /// isolated directory prevents accidental config inheritance.
+    work_dir: Option<PathBuf>,
     /// The running child process
     child: Option<Child>,
 }
@@ -33,12 +37,24 @@ impl BrokerProcess {
     /// Searches for the broker binary in target/release and target/debug
     pub fn new(workspace_root: Option<PathBuf>) -> Self {
         let binary_path = Self::find_binary(workspace_root.as_deref());
-        Self { binary_path, addr: DEFAULT_BROKER_ADDR.to_string(), config_path: None, child: None }
+        Self {
+            binary_path,
+            addr: DEFAULT_BROKER_ADDR.to_string(),
+            config_path: None,
+            work_dir: None,
+            child: None,
+        }
     }
 
     /// Create with a specific binary path and address
     pub fn with_config(binary_path: PathBuf, addr: String, config_path: Option<PathBuf>) -> Self {
-        Self { binary_path, addr, config_path, child: None }
+        Self { binary_path, addr, config_path, work_dir: None, child: None }
+    }
+
+    /// Set the working directory used when spawning the broker
+    pub fn with_work_dir(mut self, work_dir: PathBuf) -> Self {
+        self.work_dir = Some(work_dir);
+        self
     }
 
     /// Find the broker binary
@@ -70,17 +86,31 @@ impl BrokerProcess {
             return Ok(());
         }
 
-        if !self.binary_path.exists() {
-            return Err(anyhow::anyhow!("broker binary not found at {:?}", self.binary_path));
+        // Resolve relative binary paths against the harness CWD *before*
+        // switching the child into an isolated working directory.
+        let binary_path = if self.binary_path.is_relative() {
+            std::env::current_dir()
+                .map(|cwd| cwd.join(&self.binary_path))
+                .unwrap_or_else(|_| self.binary_path.clone())
+        } else {
+            self.binary_path.clone()
+        };
+        if !binary_path.exists() {
+            return Err(anyhow::anyhow!("broker binary not found at {:?}", binary_path));
         }
 
-        info!("Starting broker: {:?}", self.binary_path);
+        info!("Starting broker: {:?}", binary_path);
 
-        let mut cmd = std::process::Command::new(&self.binary_path);
+        let mut cmd = std::process::Command::new(&binary_path);
         cmd.stdout(std::process::Stdio::piped()).stderr(std::process::Stdio::piped());
 
+        if let Some(ref work_dir) = self.work_dir {
+            cmd.current_dir(work_dir);
+        }
+
         if let Some(ref config) = self.config_path {
-            cmd.arg("-c").arg(config);
+            // oximqttd CLI flag is `--config` (short `-f`)
+            cmd.arg("--config").arg(config);
         }
 
         let child = cmd.spawn()?;
@@ -148,6 +178,11 @@ impl BrokerProcess {
     /// Get the broker address
     pub fn addr(&self) -> &str {
         &self.addr
+    }
+
+    /// Get the broker binary path
+    pub fn binary_path(&self) -> &std::path::Path {
+        &self.binary_path
     }
 
     /// Check if the broker process is running

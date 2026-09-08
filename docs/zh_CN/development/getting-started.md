@@ -115,6 +115,14 @@ cargo build -p oximqtt --no-default-features --features "tls"
 
 部分功能模块（acl、retainer、auth_jwt、sys_topic）已合并到 oximqtt 核心 crate 中作为内置模块。如需扩展功能，可通过钩子系统（Hook）实现。
 
+各配置段的语义不同：
+
+- `[acl]`、`[retainer]`、`[sys_topic]` 属于 MQTT 核心能力，**默认始终启用**。配置段可省略，
+  省略时使用内置默认值（如保护 `$SYS` 的默认 ACL 规则、内存保留存储 + 1MB 载荷上限、每分钟
+  发布 $SYS 主题）；段内每个字段也可省略，只写需要修改的项即可。
+- `[auth_jwt]` 为**显式启用**：配置中出现该段（即使为空）时 JWT 认证模块才会启用；
+  删除该段即完全禁用。
+
 更详细的贡献指南请参阅 [CONTRIBUTING.md](../../CONTRIBUTING.md)。
 
 ## 许可证

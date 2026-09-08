@@ -65,6 +65,11 @@ impl TestCase for DollarTopicsTest {
             subscriber.subscribe("$SYS/#", QoS::AtLeastOnce).await?;
             tokio::time::sleep(Duration::from_millis(100)).await;
 
+            // The subscription to $SYS/# itself makes the broker emit a lifecycle
+            // event (.../subscribed) that matches the new filter. Drain it before
+            // asserting on our own publish.
+            while subscriber.recv_message_timeout(Duration::from_millis(300)).await.is_some() {}
+
             // Publish to $SYS topic - should be received via explicit subscription
             publisher.publish("$SYS/broker/version", b"dollar_sys_explicit", QoS::AtLeastOnce, false).await?;
             let msg = subscriber.recv_message_timeout(Duration::from_secs(5)).await;

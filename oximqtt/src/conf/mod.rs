@@ -73,7 +73,35 @@ pub struct Inner {
 impl Deref for Settings {
     type Target = Inner;
     fn deref(&self) -> &Self::Target {
-        self.0.as_ref()
+        &self.0
+    }
+}
+
+/// Built-in default configuration, used as a fallback when neither
+/// [`Settings::init()`] nor any configuration file is available.
+impl Default for Inner {
+    fn default() -> Self {
+        let mut listeners = Listeners::default();
+        listeners.init();
+        listeners.set_default();
+        Self {
+            task: Task::default(),
+            node: Node::default(),
+            log: Log::default(),
+            listeners,
+            acl: serde_json::Value::Null,
+            retainer: serde_json::Value::Null,
+            auth_jwt: serde_json::Value::Null,
+            sys_topic: serde_json::Value::Null,
+            mqtt: Mqtt::default(),
+            opts: Options::default(),
+        }
+    }
+}
+
+impl Default for Settings {
+    fn default() -> Self {
+        Self(Arc::new(Inner::default()))
     }
 }
 
@@ -114,15 +142,20 @@ impl Settings {
     #[inline]
     /// Returns a reference to the global `Settings` instance.
     ///
-    /// # Panics
-    /// Panics if `Settings` has not been initialized via `init()`.
+    /// If [`Settings::init()`] has not been called (e.g. when the broker is
+    /// embedded as a library), this lazily falls back to configuration files
+    /// discovered with default options, or to built-in defaults if loading
+    /// them fails. It never panics.
     pub fn instance() -> &'static Self {
-        match SETTINGS.get() {
-            Some(c) => c,
-            None => {
-                unreachable!("Settings not initialized");
-            }
-        }
+        SETTINGS.get_or_init(|| {
+            Self::new(Options::default()).unwrap_or_else(|e| {
+                log::warn!(
+                    "Settings not initialized and configuration load failed ({e}), \
+                     falling back to built-in defaults"
+                );
+                Self::default()
+            })
+        })
     }
 
     /// Initializes the global `Settings` singleton with the given options.

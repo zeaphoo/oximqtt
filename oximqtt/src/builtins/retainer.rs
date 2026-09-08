@@ -28,8 +28,12 @@ pub struct PluginConfig {
 }
 
 impl PluginConfig {
+    /// Bounded by default: the store is RAM-based, so an unbounded retained
+    /// message count is a memory-exhaustion hazard if left to user config.
+    /// `max_retained_messages` counts distinct topics holding a retained
+    /// message. Set `0` explicitly to opt out of the limit.
     fn max_retained_messages_default() -> isize {
-        0
+        10_000
     }
 
     fn max_payload_size_default() -> Bytesize {
@@ -82,10 +86,17 @@ impl RetainStorage for RamRetainer {
         }
 
         if max_retained_messages > 0 && self.inner.count().await >= max_retained_messages {
-            log::warn!(
-                "The retained message has exceeded the maximum limit of: {max_retained_messages}, topic: {topic:?}, retain: {retain:?}"
-            );
-            return Ok(());
+            // The cap counts distinct topics. Replacing an already-retained
+            // topic consumes no new slot and must stay allowed, otherwise
+            // hitting the cap would silently freeze every existing retained
+            // state. Only brand-new topics are refused.
+            let existing = !self.get(topic).await?.is_empty();
+            if !existing {
+                log::warn!(
+                    "The retained message has exceeded the maximum limit of: {max_retained_messages}, refuse new topic: {topic:?}"
+                );
+                return Ok(());
+            }
         }
 
         let expiry_interval = retained_message_ttl
@@ -153,4 +164,33 @@ pub async fn init(scx: &crate::context::ServerContext) -> Result<()> {
     *scx.extends.retain_mut().await = r;
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// An empty `[retainer]` section must parse and fall back to safe,
+    /// bounded defaults (regression guard for missing `serde(default)`s).
+    #[test]
+    fn empty_section_uses_bounded_defaults() {
+        let cfg: PluginConfig = serde_json::from_value(serde_json::json!({})).unwrap();
+        assert!(cfg.max_retained_messages > 0, "default retained cap must be bounded");
+        assert_eq!(cfg.max_retained_messages, 10_000);
+        assert_eq!(cfg.max_payload_size.0, 1024 * 1024);
+        assert_eq!(cfg.retained_message_ttl, None);
+    }
+
+    #[test]
+    fn explicit_values_override_defaults() {
+        let cfg: PluginConfig = serde_json::from_value(serde_json::json!({
+            "max_retained_messages": 0,
+            "max_payload_size": "64KB",
+            "retained_message_ttl": "1h"
+        }))
+        .unwrap();
+        assert_eq!(cfg.max_retained_messages, 0); // explicit opt-out of the cap
+        assert_eq!(cfg.max_payload_size.0, 64 * 1024);
+        assert_eq!(cfg.retained_message_ttl, Some(Duration::from_secs(3600)));
+    }
 }

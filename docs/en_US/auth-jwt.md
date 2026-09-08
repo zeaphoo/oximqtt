@@ -39,6 +39,10 @@ auth_jwt
 [auth_jwt]
 ```
 
+> The section is optional. If it is not present, the JWT authentication module stays
+> disabled and the broker runs without it. If the section is present, the module is
+> enabled and all options below are optional — omitted ones use the documented defaults.
+
 #### Configuration options:
 
 ```bash

@@ -57,13 +57,19 @@ acl.rules = [
 ##--------------------------------------------------------------------
 ## Retainer
 ##--------------------------------------------------------------------
-retainer.max_retained_messages = 0
+## Max distinct topics holding a retained message (RAM-based store).
+## Default: 10000. When reached, refreshing existing topics still works;
+## only brand-new retained topics are dropped. Set 0 to remove the limit.
+retainer.max_retained_messages = 10000
 retainer.max_payload_size = "1MB"
 retainer.retained_message_ttl = "0m"
 
 ##--------------------------------------------------------------------
 ## Auth JWT
 ##--------------------------------------------------------------------
+## Optional section: remove/comment all auth_jwt.* lines to disable
+## the JWT authentication module. When present, every option below
+## may be omitted and falls back to its default.
 auth_jwt.disconnect_if_pub_rejected = true
 auth_jwt.disconnect_if_expiry = false
 auth_jwt.from = "password"

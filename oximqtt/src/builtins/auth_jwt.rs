@@ -62,14 +62,15 @@ pub struct PluginConfig {
     )]
     pub encrypt: JWTEncrypt,
 
-    #[serde(default)]
+    #[serde(default = "PluginConfig::hmac_secret_default")]
     pub hmac_secret: String,
+    #[serde(default)]
     pub hmac_base64: bool,
     #[serde(default)]
     pub public_key: String,
 
     #[serde(
-        default,
+        default = "PluginConfig::validate_claims_default",
         serialize_with = "PluginConfig::serialize_validate_claims",
         deserialize_with = "PluginConfig::deserialize_validate_claims"
     )]
@@ -135,6 +136,17 @@ impl PluginConfig {
 
     fn disconnect_if_expiry_default() -> bool {
         false
+    }
+
+    fn hmac_secret_default() -> String {
+        "oximqttsecret".into()
+    }
+
+    fn validate_claims_default() -> ValidateClaims {
+        ValidateClaims {
+            validate_exp_enable: true,
+            ..Default::default()
+        }
     }
 
     #[inline]
@@ -317,9 +329,34 @@ fn parse(name: &str, val: &serde_json::Value) -> (ValidateExpEnable, ValidateNbf
 pub async fn init(scx: &ServerContext) -> Result<()> {
     let mut cfg = {
         let val = crate::conf::Settings::instance().auth_jwt.clone();
-        let val = if val.is_null() { serde_json::json!({}) } else { val };
+        // The `[auth_jwt]` section is optional: if it is absent the module stays disabled.
+        if val.is_null() {
+            log::info!("auth_jwt section not configured, module disabled");
+            return Ok(());
+        }
         serde_json::from_value::<PluginConfig>(val)?
     };
+    match &cfg.encrypt {
+        JWTEncrypt::HmacBased => {
+            if cfg.hmac_secret.is_empty() {
+                return Err(anyhow!(
+                    "auth_jwt.hmac_secret must not be empty when encrypt = \"hmac-based\""
+                ));
+            }
+            if cfg.hmac_secret == PluginConfig::hmac_secret_default() {
+                log::warn!(
+                    "auth_jwt.hmac_secret is the built-in default value, change it for production"
+                );
+            }
+        }
+        JWTEncrypt::PublicKey => {
+            if cfg.public_key.is_empty() {
+                return Err(anyhow!(
+                    "auth_jwt.public_key must be set when encrypt = \"public-key\""
+                ));
+            }
+        }
+    }
     cfg.init_decoding_key()?;
     log::info!("auth_jwt cfg: {cfg:?}");
     let cfg = Arc::new(RwLock::new(cfg));
@@ -625,5 +662,36 @@ impl Handler for AuthHandler {
             }
         }
         (true, acc)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// An empty `[auth_jwt]` section must parse into the documented defaults
+    /// (regression guard: `hmac_base64` once lacked `#[serde(default)]`, which
+    /// made minimal configs abort startup with `missing field hmac_base64`).
+    #[test]
+    fn empty_section_uses_documented_defaults() {
+        let mut cfg: PluginConfig = serde_json::from_value(serde_json::json!({})).unwrap();
+        assert!(!cfg.hmac_base64, "hmac_base64 must default to false");
+        assert_eq!(cfg.hmac_secret, "oximqttsecret");
+        assert!(matches!(cfg.from, JWTFrom::Password));
+        assert!(matches!(cfg.encrypt, JWTEncrypt::HmacBased));
+        assert!(cfg.validate_claims.validate_exp_enable);
+        assert!(!cfg.validate_claims.validate_nbf_enable);
+        assert!(cfg.disconnect_if_pub_rejected);
+        assert!(!cfg.disconnect_if_expiry);
+        // key derivation from the default secret must succeed
+        assert!(cfg.init_decoding_key().is_ok());
+    }
+
+    #[test]
+    fn partial_section_fills_missing_fields() {
+        let cfg: PluginConfig =
+            serde_json::from_value(serde_json::json!({"hmac_secret": "s3cr3t"})).unwrap();
+        assert_eq!(cfg.hmac_secret, "s3cr3t");
+        assert!(!cfg.hmac_base64);
     }
 }

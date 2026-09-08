@@ -29,15 +29,15 @@ async fn main() -> Result<()> {
     }
 
     //init config
-    let conf = Settings::init(Options::parse()).expect("settings init failed");
+    let conf = Settings::init(opts)?;
 
     //rustls crypto install default
     tls_provider::default_provider()
         .install_default()
-        .expect("Failed to install the default Rustls crypto backend because it is already installed.");
+        .map_err(|_| anyhow::anyhow!("default rustls crypto provider is already installed"))?;
 
     //init log
-    logger::logger_init(&conf.log).expect("logger init failed");
+    logger::logger_init(&conf.log)?;
 
     //node info
     let node = Node::new(
@@ -67,7 +67,7 @@ async fn main() -> Result<()> {
         .await;
 
     //init built-in modules
-    oximqtt::builtins::init_all(&scx).await.expect("builtins init failed");
+    oximqtt::builtins::init_all(&scx).await?;
 
     let mut builder = MqttServer::new(scx);
 

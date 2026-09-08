@@ -46,7 +46,8 @@ struct Opt {
     #[arg(long)]
     workspace: Option<String>,
 
-    /// Run only specific test suites (functional_v3, functional_v311, functional_v5, stress, chaos)
+    /// Run only specific test suites (functional_v3, functional_v311, functional_v5,
+    /// functional_config, compat, stress, chaos)
     #[arg(short, long)]
     suites: Vec<String>,
 
@@ -104,17 +105,47 @@ fn main() {
     };
 
     // Start broker if needed (synchronous - BrokerProcess uses std::process)
+    let mut harness_temp: Option<PathBuf> = None;
     let broker = if !opt.no_broker {
-        let mut broker = if let Some(ref binary) = opt.binary {
-            BrokerProcess::with_config(
-                PathBuf::from(binary),
-                opt.addr.clone(),
-                opt.config.as_ref().map(PathBuf::from),
-            )
-        } else {
-            let workspace = opt.workspace.as_ref().map(PathBuf::from);
-            BrokerProcess::new(workspace)
+        let workspace = opt.workspace.as_ref().map(PathBuf::from);
+        let binary = opt
+            .binary
+            .as_ref()
+            .map(PathBuf::from)
+            .unwrap_or_else(|| BrokerProcess::find_binary(workspace.as_deref()));
+
+        // When no explicit --config is given, start the broker with a hermetic
+        // minimal config (single TCP listener on --addr, console logging) from an
+        // isolated working directory. Otherwise the broker would auto-discover any
+        // ./oximqtt.toml next to the harness CWD (e.g. the repository config),
+        // making test behavior depend on where the harness was launched.
+        let (config_path, work_dir) = match &opt.config {
+            Some(c) => (Some(PathBuf::from(c)), None),
+            None => {
+                let dir =
+                    std::env::temp_dir().join(format!("mqtt-harness-{}", std::process::id()));
+                if let Err(e) = std::fs::create_dir_all(&dir) {
+                    error!("Failed to create harness temp dir {dir:?}: {e}");
+                    std::process::exit(1);
+                }
+                let config = dir.join("harness-broker.toml");
+                let content = format!(
+                    "listener.tcp.external.addr = \"{}\"\nlog.to = \"console\"\n",
+                    opt.addr
+                );
+                if let Err(e) = std::fs::write(&config, content) {
+                    error!("Failed to write harness config: {e}");
+                    std::process::exit(1);
+                }
+                harness_temp = Some(dir.clone());
+                (Some(config), Some(dir))
+            }
         };
+
+        let mut broker = BrokerProcess::with_config(binary, opt.addr.clone(), config_path);
+        if let Some(dir) = work_dir {
+            broker = broker.with_work_dir(dir);
+        }
 
         match broker.start() {
             Ok(()) => {
@@ -174,6 +205,13 @@ fn main() {
         Err(e) => error!("Failed to write detail log: {}", e),
     }
 
+    // Stop the broker and clean up harness temp files before exiting:
+    // std::process::exit below bypasses Drop, which would orphan the child.
+    let _ = ctx.kill_broker();
+    if let Some(ref dir) = harness_temp {
+        let _ = std::fs::remove_dir_all(dir);
+    }
+
     // Exit code
     if summary.failed > 0 || summary.errors > 0 {
         std::process::exit(1);
@@ -197,6 +235,14 @@ fn build_suites(opt: &Opt) -> Vec<TestSuite> {
 
     if should_run("functional_v5") {
         suites.push(build_functional_v5_suite());
+    }
+
+    if should_run("functional_config") {
+        suites.push(build_functional_config_suite());
+    }
+
+    if should_run("compat") {
+        suites.push(build_compat_suite());
     }
 
     if should_run("stress") {
@@ -347,6 +393,34 @@ fn build_functional_v5_suite() -> TestSuite {
     suite.add(RequestResponseV5Test);
     suite.add(UserPropertiesV5Test);
     suite.add(ClientTopicAliasV5Test);
+    suite
+}
+
+fn build_functional_config_suite() -> TestSuite {
+    use tests::functional::config_e2e::*;
+
+    let mut suite = TestSuite::new("functional_config");
+    // Regression: optional auth_jwt must not be required to start
+    suite.add(MinimalConfigNoAuthJwtTest);
+    suite.add(AuthJwtEmptySectionDefaultsTest);
+    suite.add(AuthJwtPartialSectionTest);
+    suite.add(AuthJwtMissingPubKeyCleanExitTest);
+    suite.add(AuthJwtWrongTypeCleanExitTest);
+    suite.add(UnknownConfigSectionsIgnoredTest);
+    suite.add(RetainerCapKeepsExistingTopicsFreshTest);
+    suite
+}
+
+fn build_compat_suite() -> TestSuite {
+    use tests::functional::compat_clients::*;
+
+    let mut suite = TestSuite::new("compat");
+    suite.add(CompatConcurrentMultiVersionTest);
+    suite.add(CompatCrossVersionPubSubTest);
+    suite.add(CompatRetainedCrossVersionTest);
+    suite.add(CompatWildcardCrossVersionTest);
+    suite.add(CompatTakeoverAcrossVersionsTest);
+    suite.add(CompatManyMixedClientsTest);
     suite
 }
 

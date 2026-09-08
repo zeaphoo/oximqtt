@@ -188,7 +188,16 @@ The built-in modules (ACL, JWT auth, retainer, sys_topic) are part of the `oximq
 - `[retainer]` — Retained message storage
 - `[sys_topic]` — $SYS system topic publishing
 
-To enable a built-in module, add its configuration section to `oximqtt.toml`. To disable it, comment out or remove the section.
+Section semantics differ by module:
+
+- `[acl]`, `[retainer]`, `[sys_topic]` are **core MQTT capabilities and always active**.
+  The sections are optional: when absent, the built-in defaults apply (e.g. default ACL
+  rules protecting `$SYS`, in-memory retained storage with a 1MB payload cap, $SYS topics
+  published every minute). Every field inside them is optional too — only the values you
+  want to change need to be written.
+- `[auth_jwt]` is **opt-in**: the JWT authentication module is only enabled when the
+  section is present in the config (even an empty `[auth_jwt]` enables it with defaults).
+  Remove the section to disable it entirely.
 
 ### Extending the Broker
 

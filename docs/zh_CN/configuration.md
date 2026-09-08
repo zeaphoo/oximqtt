@@ -143,10 +143,12 @@ listener.tls.external.key = "./oximqtt-bin/oximqtt.key"
 
 ## `[acl]` — 访问控制
 
+> 默认启用；该段及其所有字段均可省略。不写 `[acl]` 段时，broker 应用下文所述的内置默认规则集。
+
 | 字段 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
 | `disconnect_if_pub_rejected` | `bool` | `true` | 发布被拒绝时断开连接 |
-| `rules` | array | `[]` | ACL 规则列表 |
+| `rules` | array | 内置规则 | ACL 规则列表；默认允许 `dashboard` 用户与 `127.0.0.1` 访问 `$SYS`，拒绝匿名通配符订阅 `$SYS/#`，随后允许全部 |
 
 规则格式：`["allow"|"deny", {user="..."} | "all", "pubsub"|"publish"|"subscribe", ["topic/pattern/#"]]`
 
@@ -154,15 +156,25 @@ listener.tls.external.key = "./oximqtt-bin/oximqtt.key"
 
 ## `[retainer]` — 保留消息
 
+> 保留消息是 MQTT 核心能力：**始终启用**，即使不写 `[retainer]` 段（内存存储，字段
+> 全部使用下表默认值）。计数上限**默认即为有界值是有意为之**——存储位于内存，若无界
+> 默认值遇上失控的 retain 主题发布，内存耗尽风险不应依赖运维者记得手动配置。
+> 达到上限后：对已有保留主题的刷新仍会成功（不占用新名额）；仅丢弃**全新主题**的
+> 保留消息并打印告警。显式设置为 `0` 表示放弃上限。
+
 | 字段 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
-| `max_retained_messages` | `usize` | `0` | 最大保留消息数；`0` = 无限制 |
+| `max_retained_messages` | `usize` | `10000` | 保留消息主题数上限；显式 `0` = 无限制 |
 | `max_payload_size` | bytesize | `"1MB"` | 最大载荷大小 |
 | `retained_message_ttl` | duration | `"0m"` | TTL；`0` = 不过期 |
 
 ---
 
 ## `[auth_jwt]` — JWT 认证
+
+> 整个配置段是可选的：配置文件中不写该段时，JWT 认证完全不启用。只要出现该段（即使为空），
+> 模块即启用，且每个字段都可省略并回落到下表所列默认值，因此只需写要修改的项。
+> 生产环境务必覆盖 `hmac_secret`（使用内置默认值时启动会打印告警）。
 
 | 字段 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
@@ -177,6 +189,11 @@ listener.tls.external.key = "./oximqtt-bin/oximqtt.key"
 ---
 
 ## `[sys_topic]` — 系统主题
+
+> 与 `[acl]`/`[retainer]` 相同，**默认启用**：不写 `[sys_topic]` 段时模块仍按下列默认值
+> 运行（每分钟 $SYS stats/metrics + 客户端生命周期事件）。$SYS 的可见性由默认 ACL
+> 规则收口（仅 `dashboard` 用户与 `127.0.0.1` 可订阅 `$SYS/**`）。该段仅用于调整
+> 发布间隔/QoS/过期时间，不提供开关。
 
 | 字段 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|

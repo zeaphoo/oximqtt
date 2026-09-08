@@ -3,6 +3,9 @@
 pub mod assigned_clientid_v5;
 pub mod auth_v311;
 pub mod boundary;
+pub mod broker_fixture;
+pub mod compat_clients;
+pub mod config_e2e;
 pub mod connect_v3;
 pub mod connect_v311;
 pub mod connect_v5;

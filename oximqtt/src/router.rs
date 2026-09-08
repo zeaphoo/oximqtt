@@ -217,14 +217,6 @@ impl DefaultRouter {
                             );
                         }
                     }
-                    {
-                        collector_map.entry(id.node_id).or_default().add(
-                            &topic_filter,
-                            client_id.clone(),
-                            opts.clone(),
-                            None,
-                        );
-                    }
                 }
             }
 

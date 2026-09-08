@@ -222,11 +222,23 @@ async fn _handshake(
         return Err((ack, anyhow!("Authentication failed")));
     }
 
-    let mut entry = match { scx.extends.shared().await.entry(id.clone()) }.try_lock().await {
-        Err(e) => {
-            return Err((ConnectAckReason::V3(ConnectAckReasonV3::ServiceUnavailable), e));
+    // A quick reconnect with the same client-id can race with the previous
+    // session's teardown, which still holds the entry lock. Retry briefly
+    // instead of refusing the client with ServiceUnavailable immediately.
+    let mut entry = {
+        let mut attempts = 0;
+        loop {
+            match { scx.extends.shared().await.entry(id.clone()) }.try_lock().await {
+                Ok(entry) => break entry,
+                Err(_e) if attempts < 10 => {
+                    attempts += 1;
+                    tokio::time::sleep(std::time::Duration::from_millis(20)).await;
+                }
+                Err(e) => {
+                    return Err((ConnectAckReason::V3(ConnectAckReasonV3::ServiceUnavailable), e));
+                }
+            }
         }
-        Ok(entry) => entry,
     };
 
     // Kick out the current session, if it exists
