@@ -139,13 +139,18 @@ pub fn binary(name: &str) -> PathBuf {
         "release"
     };
     let root = workspace_root();
-    for candidate in [
-        root.join("target").join(profile).join(name),
-        root.join("target").join("release").join(name),
-        root.join("target").join("debug").join(name),
+    // Windows appends `.exe` to executable names.
+    let exe = format!("{name}{}", std::env::consts::EXE_SUFFIX);
+    for dir in [
+        root.join("target").join(profile),
+        root.join("target").join("release"),
+        root.join("target").join("debug"),
     ] {
-        if candidate.exists() {
-            return candidate;
+        for file in [name, &exe] {
+            let candidate = dir.join(file);
+            if candidate.exists() {
+                return candidate;
+            }
         }
     }
     panic!(
