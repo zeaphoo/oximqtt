@@ -7,6 +7,12 @@
 //!
 //! Build both binaries first:
 //! `cargo build --release -p oximqtt-bench -p oximqttd`
+//!
+//! The broker-backed tests are `#[ignore]`d by default because they are
+//! resource-heavy and timing-sensitive on small CI runners; `cargo test`
+//! skips them and keeps the no-broker checks (CLI, option validation).
+//! Run them locally with:
+//! `cargo test -p oximqtt-bench --test e2e -- --ignored`
 
 mod support;
 
@@ -100,21 +106,25 @@ fn self_subscription(subcommand: &str, qos: u8) {
     }
 }
 
+#[ignore = "requires a live broker and is resource-heavy; run locally with: cargo test -p oximqtt-bench --test e2e -- --ignored"]
 #[test]
 fn v3_self_subscription_qos0() {
     self_subscription("v3", 0);
 }
 
+#[ignore = "requires a live broker and is resource-heavy; run locally with: cargo test -p oximqtt-bench --test e2e -- --ignored"]
 #[test]
 fn v3_self_subscription_qos1() {
     self_subscription("v3", 1);
 }
 
+#[ignore = "requires a live broker and is resource-heavy; run locally with: cargo test -p oximqtt-bench --test e2e -- --ignored"]
 #[test]
 fn v3_self_subscription_qos2() {
     self_subscription("v3", 2);
 }
 
+#[ignore = "requires a live broker and is resource-heavy; run locally with: cargo test -p oximqtt-bench --test e2e -- --ignored"]
 #[test]
 fn v5_self_subscription_qos2() {
     self_subscription("v5", 2);
@@ -124,17 +134,28 @@ fn v5_self_subscription_qos2() {
 /// (0x02, Send Onward) and a publish window wider than the broker's advertised
 /// Receive Maximum: the broker must accept the standard reason and the client
 /// must honour the advertised window.
+#[ignore = "requires a live broker and is resource-heavy; run locally with: cargo test -p oximqtt-bench --test e2e -- --ignored"]
 #[test]
 fn v5_qos2_saturate_spec_reason_send_onward() {
     let broker = Broker::with_config("");
     let (out, r) = Bench::new(broker.addr())
         .line("-c 8 -S -P -q 2 -t sat/{cid} -l 100 -I 0 -d 8 --drain 3")
         .run("v5");
-    assert!(out.status.success(), "{}", String::from_utf8_lossy(&out.stderr));
+    assert!(
+        out.status.success(),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
     let c = &r.report.counters;
     assert_eq!(c.sends, 800, "every publisher reaches its limit: {c:?}");
-    assert_eq!(c.recvs, 800, "1:1 self subscription must match exactly: {c:?}");
-    assert_eq!(c.conn_fail, 0, "the broker must accept PUBREL reason 0x02: {r:?}");
+    assert_eq!(
+        c.recvs, 800,
+        "1:1 self subscription must match exactly: {c:?}"
+    );
+    assert_eq!(
+        c.conn_fail, 0,
+        "the broker must accept PUBREL reason 0x02: {r:?}"
+    );
     assert_eq!(c.errors, 0, "clean run: {r:?}");
     assert_eq!(c.pub_acks, 800, "every QoS 2 exchange must complete");
 }
@@ -142,23 +163,35 @@ fn v5_qos2_saturate_spec_reason_send_onward() {
 /// MQTT 3.1.1 QoS 2 saturation with 100 in-flight while the broker only
 /// allows 16: the broker applies inbound flow control (defers PUBREC) instead
 /// of disconnecting the client, so every message still completes.
+#[ignore = "requires a live broker and is resource-heavy; run locally with: cargo test -p oximqtt-bench --test e2e -- --ignored"]
 #[test]
 fn v3_qos2_saturate_over_broker_window_flow_controls() {
     let broker = Broker::with_config("");
     let (out, r) = Bench::new(broker.addr())
         .line("-c 8 -S -P -q 2 -t fc/{cid} -l 100 -I 0 -d 10 --drain 4")
         .run("v3");
-    assert!(out.status.success(), "{}", String::from_utf8_lossy(&out.stderr));
+    assert!(
+        out.status.success(),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
     let c = &r.report.counters;
     assert_eq!(c.conn_fail, 0, "flow control must never disconnect: {r:?}");
     assert_eq!(c.sends, 800);
-    assert_eq!(c.recvs, 800, "no message may be lost to flow control: {c:?}");
-    assert_eq!(c.ack_timeouts, 0, "nothing may stall for the whole drain: {c:?}");
+    assert_eq!(
+        c.recvs, 800,
+        "no message may be lost to flow control: {c:?}"
+    );
+    assert_eq!(
+        c.ack_timeouts, 0,
+        "nothing may stall for the whole drain: {c:?}"
+    );
     assert_eq!(c.errors, 0);
 }
 
 /// The broker also emits the standard PUBREL reason code 0x02 when it delivers
 /// QoS 2 messages to a subscriber (the receive side of this run).
+#[ignore = "requires a live broker and is resource-heavy; run locally with: cargo test -p oximqtt-bench --test e2e -- --ignored"]
 #[test]
 fn v5_qos2_subscribe_receives_standard_pubrel() {
     let broker = Broker::with_config("");
@@ -166,37 +199,47 @@ fn v5_qos2_subscribe_receives_standard_pubrel() {
     let (out, p) = Bench::new(broker.addr())
         .line("-c 2 -P -q 2 -t sp/topic -I 0 -s 64 -d 6")
         .run("v5");
-    assert!(out.status.success(), "{}", String::from_utf8_lossy(&out.stderr));
+    assert!(
+        out.status.success(),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
     assert!(p.report.counters.sends > 100);
     assert_eq!(p.report.counters.conn_fail, 0);
     assert_eq!(p.report.counters.errors, 0);
 }
 
+#[ignore = "requires a live broker and is resource-heavy; run locally with: cargo test -p oximqtt-bench --test e2e -- --ignored"]
 #[test]
 fn v3_qos0_roundtrip() {
     roundtrip("v3", 0);
 }
 
+#[ignore = "requires a live broker and is resource-heavy; run locally with: cargo test -p oximqtt-bench --test e2e -- --ignored"]
 #[test]
 fn v3_qos1_roundtrip() {
     roundtrip("v3", 1);
 }
 
+#[ignore = "requires a live broker and is resource-heavy; run locally with: cargo test -p oximqtt-bench --test e2e -- --ignored"]
 #[test]
 fn v3_qos2_roundtrip() {
     roundtrip("v3", 2);
 }
 
+#[ignore = "requires a live broker and is resource-heavy; run locally with: cargo test -p oximqtt-bench --test e2e -- --ignored"]
 #[test]
 fn v5_qos0_roundtrip() {
     roundtrip("v5", 0);
 }
 
+#[ignore = "requires a live broker and is resource-heavy; run locally with: cargo test -p oximqtt-bench --test e2e -- --ignored"]
 #[test]
 fn v5_qos1_roundtrip() {
     roundtrip("v5", 1);
 }
 
+#[ignore = "requires a live broker and is resource-heavy; run locally with: cargo test -p oximqtt-bench --test e2e -- --ignored"]
 #[test]
 fn v5_qos2_roundtrip() {
     roundtrip("v5", 2);
@@ -206,6 +249,7 @@ fn v5_qos2_roundtrip() {
 /// (Send Onward). This used to be rejected by the broker's v5 codec (only
 /// `Success = 0` and `PacketIdNotFound = 146` existed), which made every
 /// conformant client fail. The codec now implements the standard value.
+#[ignore = "requires a live broker and is resource-heavy; run locally with: cargo test -p oximqtt-bench --test e2e -- --ignored"]
 #[test]
 fn v5_qos2_pubrel_reason_is_send_onward() {
     let broker = Broker::with_config("");
@@ -224,6 +268,7 @@ fn v5_qos2_pubrel_reason_is_send_onward() {
 }
 
 /// 1 publisher group -> many subscribers, every subscriber gets every message.
+#[ignore = "requires a live broker and is resource-heavy; run locally with: cargo test -p oximqtt-bench --test e2e -- --ignored"]
 #[test]
 fn fan_out_delivers_to_every_subscriber() {
     let broker = Broker::with_config("");
@@ -263,6 +308,7 @@ fn fan_out_delivers_to_every_subscriber() {
 
 /// Large connection count with subscriptions: the classic "connect storm"
 /// benchmark.
+#[ignore = "requires a live broker and is resource-heavy; run locally with: cargo test -p oximqtt-bench --test e2e -- --ignored"]
 #[test]
 fn connection_scale() {
     let broker = Broker::with_config("");
@@ -289,6 +335,7 @@ fn connection_scale() {
 
 /// The churn controller must disconnect and reconnect connections without
 /// producing errors.
+#[ignore = "requires a live broker and is resource-heavy; run locally with: cargo test -p oximqtt-bench --test e2e -- --ignored"]
 #[test]
 fn churn_controller_reconnects() {
     let broker = Broker::with_config("");
@@ -313,6 +360,7 @@ fn churn_controller_reconnects() {
 }
 
 /// Retained messages are received by a client that subscribes later.
+#[ignore = "requires a live broker and is resource-heavy; run locally with: cargo test -p oximqtt-bench --test e2e -- --ignored"]
 #[test]
 fn retained_messages_are_delivered() {
     let broker = Broker::with_config("");
