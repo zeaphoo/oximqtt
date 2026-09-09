@@ -53,7 +53,7 @@ Before submitting an issue:
 ## Environment
 - OS: [e.g. Ubuntu 24.04]
 - Rust: [e.g. 1.89.0]
-- OXIMQTT: [e.g. 0.22.0]
+- OXIMQTT: [e.g. 0.23.0]
 ```
 
 ### Feature Request Template

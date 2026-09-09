@@ -40,7 +40,7 @@ cargo build -p oximqttd --release
 
 ```toml
 [dependencies]
-oximqtt = "0.22"
+oximqtt = "0.23"
 ```
 
 See [oximqtt crate docs](./oximqtt/README.md) for library usage examples.

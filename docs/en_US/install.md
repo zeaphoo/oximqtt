@@ -4,48 +4,53 @@ English | [简体中文](../zh_CN/install.md)
 
 ## Install
 
-OXIMQTT Currently supported operating systems:
+OXIMQTT currently supports the following operating systems (prebuilt binaries are
+published for Linux amd64/arm64; macOS and Windows are built from source):
 
-- Linux
-- macOS
-- Windows Server
+### Installing the prebuilt binary (Linux amd64 / arm64)
 
-### Installing via ZIP Binary Package (Linux、MacOS、Windows)
+Prebuilt Linux binaries are published on every [GitHub Release](https://github.com/zeaphoo/oximqtt/releases).
+They are statically linked against musl and built by GitHub Actions, so they run
+on any Linux distribution without extra runtime dependencies. macOS and Windows
+are supported by building from source (see the next section) — no prebuilt
+packages are published for them.
 
-Get the binary package of the corresponding OS from [OXIMQTT Download](https://github.com/zeaphoo/oximqtt/releases) page.
-
-1. Download the ZIP package from [GitHub Release](https://github.com/zeaphoo/oximqtt/releases).
+1. Download the archive for your architecture:
 
 ```bash
-$ wget "https://github.com/zeaphoo/oximqtt/releases/download/0.22.0/oximqtt-0.22.0-x86_64-unknown-linux-musl.zip"
+# x86_64 / amd64
+$ wget "https://github.com/zeaphoo/oximqtt/releases/latest/download/oximqtt-linux-amd64.tar.gz"
+
+# ARM64 / aarch64
+$ wget "https://github.com/zeaphoo/oximqtt/releases/latest/download/oximqtt-linux-arm64.tar.gz"
 ```
 
-2. Decompress the zip package you downloaded from [GitHub Release](https://github.com/zeaphoo/oximqtt/releases).
+   To pin a specific release, use its tag: `https://github.com/zeaphoo/oximqtt/releases/download/v0.23.0/oximqtt-linux-amd64.tar.gz`.
+
+2. Extract it (the archive contains `oximqttd` and `oximqtt.toml` at its root):
 
 ```bash
-$ unzip oximqtt-0.22.0-x86_64-unknown-linux-musl.zip -d /app/
+$ mkdir -p /app/oximqtt && tar -xzf oximqtt-linux-amd64.tar.gz -C /app/oximqtt
 ```
 
-3. Modify the permissions
+3. Make the binary executable:
 
 ```bash
-$ cd /app/oximqtt
-$ chmod +x bin/oximqttd
+$ cd /app/oximqtt && chmod +x oximqttd
 ```
 
-4. Start the service
+4. Start the service:
 
 ```bash
-$ cd /app/oximqtt
-$ ./bin/oximqttd -f ./etc/oximqtt.toml
+$ cd /app/oximqtt && ./oximqttd -f ./oximqtt.toml
 ```
 
-5. Check the service
+5. Check the service:
 
 ```bash
-$ netstat -tlnp|grep 1883
-tcp        0      0 0.0.0.0:1883            0.0.0.0:*               LISTEN      3312/./bin/oximqttd
-tcp        0      0 0.0.0.0:11883           0.0.0.0:*               LISTEN      3312/./bin/oximqttd
+$ netstat -tlnp | grep 1883
+tcp        0      0 0.0.0.0:1883            0.0.0.0:*               LISTEN      3312/./oximqttd
+tcp        0      0 0.0.0.0:11883           0.0.0.0:*               LISTEN      3312/./oximqttd
 ```
 
 ### Compile and install from source code

@@ -4,48 +4,52 @@
 
 ## 安装
 
-OXIMQTT 目前支持的操作系统:
+OXIMQTT 目前支持的操作系统(Linux 发布预编译 amd64/arm64 包;macOS / Windows
+需源码编译):
 
-- Linux
-- macOS
-- Windows Server
+### 预编译二进制安装(Linux amd64 / arm64)
 
-### ZIP 压缩包安装(Linux、MacOS、Windows)
+每个 [GitHub Release](https://github.com/zeaphoo/oximqtt/releases) 都会发布 Linux
+预编译包。产物由 GitHub Actions 使用 musl 静态编译，不依赖系统运行库，可在任意
+Linux 发行版上直接运行。macOS / Windows 请使用下一节的源码编译方式，官方不发布
+这两个平台的预编译包。
 
-需从 [GitHub Release](https://github.com/zeaphoo/oximqtt/releases) 页面获取相应操作系统的二进制软件包。
-
-1. 从[GitHub Release](https://github.com/zeaphoo/oximqtt/releases) 下载zip包。
+1. 按 CPU 架构下载压缩包:
 
 ```bash
-$ wget "https://github.com/zeaphoo/oximqtt/releases/download/0.22.0/oximqtt-0.22.0-x86_64-unknown-linux-musl.zip"
+# x86_64 / amd64
+$ wget "https://github.com/zeaphoo/oximqtt/releases/latest/download/oximqtt-linux-amd64.tar.gz"
+
+# ARM64 / aarch64
+$ wget "https://github.com/zeaphoo/oximqtt/releases/latest/download/oximqtt-linux-arm64.tar.gz"
 ```
 
-2. 解压从[GitHub Release](https://github.com/zeaphoo/oximqtt/releases) 下载的zip包。
+   如需固定某个版本，将 URL 换成对应 tag: `https://github.com/zeaphoo/oximqtt/releases/download/v0.23.0/oximqtt-linux-amd64.tar.gz`。
+
+2. 解压(压缩包根目录即 `oximqttd` 与 `oximqtt.toml`):
 
 ```bash
-$ unzip oximqtt-0.22.0-x86_64-unknown-linux-musl.zip -d /app/
+$ mkdir -p /app/oximqtt && tar -xzf oximqtt-linux-amd64.tar.gz -C /app/oximqtt
 ```
 
-3. 修改权限
+3. 赋予执行权限:
 
 ```bash
-$ cd /app/oximqtt
-$ chmod +x bin/oximqttd
+$ cd /app/oximqtt && chmod +x oximqttd
 ```
 
-4. 启动服务
+4. 启动服务:
 
 ```bash
-$ cd /app/oximqtt
-$ ./bin/oximqttd -f ./etc/oximqtt.toml
+$ cd /app/oximqtt && ./oximqttd -f ./oximqtt.toml
 ```
 
-5. 查看服务
+5. 查看服务:
 
 ```bash
-$ netstat -tlnp|grep 1883
-tcp        0      0 0.0.0.0:1883            0.0.0.0:*               LISTEN      3312/./bin/oximqttd
-tcp        0      0 0.0.0.0:11883           0.0.0.0:*               LISTEN      3312/./bin/oximqttd
+$ netstat -tlnp | grep 1883
+tcp        0      0 0.0.0.0:1883            0.0.0.0:*               LISTEN      3312/./oximqttd
+tcp        0      0 0.0.0.0:11883           0.0.0.0:*               LISTEN      3312/./oximqttd
 ```
 
 ### 源码编译安装

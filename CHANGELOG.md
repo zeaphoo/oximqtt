@@ -5,32 +5,25 @@ All notable changes to OXIMQTT are documented in this file.
 ## Unreleased
 
 ### Fixed
-- Startup no longer panics when the optional `[auth_jwt]` section is absent or
-  partially specified (`missing field hmac_base64`); the module is disabled when
-  the section is missing, and all fields fall back to documented defaults.
-- Router matched every subscription twice, delivering each message to subscribers
-  in duplicate; shared-subscription members were also bypassing group selection.
-- Quick reconnect with the same client-id could be refused with
-  `ServiceUnavailable` while the previous session was still being torn down;
-  the handshake now retries the session lock briefly.
+- MQTT 5.0 QoS 2: spec-mandated `PUBREL` reason code `0x02` (Send Onward) is
+  now accepted and emitted; conformant clients were previously disconnected.
+- Inbound QoS 2: exceeding the per-connection `max_inflight` window now
+  flow-controls the client instead of disconnecting it.
+- Missing/partial `[auth_jwt]` config no longer panics at startup.
+- Router no longer delivers messages twice via a matched subscription.
+- Reconnect with the same client-id is no longer refused while the previous
+  session is being torn down.
 
 ### Changed
-- Default `retainer.max_retained_messages` is now `10000` (was `0`/unlimited) so
-  the RAM-backed retained store is bounded without operator configuration; set `0`
-  explicitly to opt out. When the cap is reached, refreshing already-retained
-  topics still succeeds and only new topics are dropped.
-- `DefaultSharedSubscription` now performs round-robin member selection
-  (preferring online members); previously shared subscriptions were accepted
-  but never delivered in the default build.
-- Broker binary reports configuration errors as clean process exits instead of
-  `expect()`-panics; `Settings::instance()` lazily falls back to defaults
-  (library mode no longer panics when `Settings::init` was not called).
+- Default `retainer.max_retained_messages` is now `10000` (was unlimited).
+- Default shared subscriptions now round-robin across members.
+- Configuration errors exit cleanly instead of panicking.
+
+### Added
+- New workspace member `oximqtt-bench`: standalone `mqtt-bench` load generator
+  with its own MQTT 3.1.1 / 5.0 codec (QoS 0/1/2, latency percentiles, churn,
+  JSON report).
 
 ### Tests
-- New `functional_config` e2e suite: minimal-config startup, `[auth_jwt]`
-  absent/empty/partial semantics, clean-exit on fatal misconfiguration,
-  unknown sections ignored, bounded retained store behavior.
-- New `compat` multi-client suite: v3.1/v3.1.1/v5.0 concurrent connections,
-  cross-version pub/sub, retained and wildcard delivery, cross-version session
-  takeover, mixed crowd fan-out.
-
+- New `functional_config` and `compat` e2e suites.
+- `oximqtt-bench`: 80 unit + 21 e2e tests against a live broker.
