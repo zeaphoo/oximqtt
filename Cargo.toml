@@ -4,6 +4,7 @@ members = [
     "oximqtt",
     "oximqtt-bin",
     "oximqtt-test",
+    "oximqtt-bench",
     "oximqtt/examples/*",
 ]
 

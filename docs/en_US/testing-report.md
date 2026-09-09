@@ -121,6 +121,43 @@ cargo build -p oximqtt-test --release
 | Publishing Clients | 40 |
 | Message Throughput Rate | 150,000 msg/s |
 
+### In-repo `mqtt-bench` validation run
+
+`oximqtt-bench` (binary `mqtt-bench`) is a standalone load generator with its
+own MQTT 3.1.1 / 5.0 protocol codec — it does not reuse the broker's codec, so
+it exercises the broker the way an external client would. A single-host
+validation run (client and broker on the same machine, loopback, 256 B
+payloads, broker `nodelay = true`) against the current tree — including the
+QoS 2 fixes (spec PUBREL reason `0x02` and inbound flow control), all runs
+using default `mqtt-bench` flags — produced:
+
+| Scenario | Result |
+|----------|--------|
+| Connections (v3.1.1, `-c 20000`) | 20,000/20,000 ok |
+| Subscriptions (`-c 10000 -S`) | 10,000/10,000 ok |
+| QoS 0 ingest, 200 saturating pubs | ~1.45 M msg/s (~3.1 Gbps) |
+| QoS 1 ingest, 200 saturating pubs | ~399 K msg/s, all acked |
+| QoS 2 ingest, 200 pubs (default flags) | ~218 K msg/s, 0 disconnect |
+| QoS 1 ingest, MQTT 5.0 | ~370 K msg/s |
+| QoS 2 ingest, MQTT 5.0 (reason 0x02) | ~204 K msg/s, 0 disconnect |
+| QoS 1 e2e 1:1, 100 conns, paced | 600,672 sent = received, p50 ≈ 0.9 ms |
+| QoS 2 e2e 1:1, 30 conns, v5, paced | 36,163 sent = received, p50 ≈ 0.3 ms |
+| Churn `-T` 500 conns, `-D 0.2` | ~91 K msg/s sustained across reconnects |
+
+Interoperability findings surfaced by the independent codec (verified with
+byte-level probes) — **both fixed in this tree**:
+
+1. **MQTT 5.0 QoS 2 PUBREL reason code**: the codec only knew `Success = 0`
+   and `PacketIdNotFound = 146`, so the spec-mandated `0x02` (Send Onward,
+   §3.4.4.1) was treated as a malformed packet and the connection was closed —
+   invisible to in-repo clients that share the codec. `SendOnward = 2` is now
+   part of `PublishAck2Reason`, and the broker emits `0x02` on its own PUBRELs.
+2. **QoS 2 inflight cap**: the per-connection `listener.*.max_inflight`
+   (default 16) used to disconnect clients that exceeded it. The inbound QoS 2
+   path now applies flow control (deferred PUBREC, drained as PUBRELs arrive)
+   instead of dropping the connection. The tool honours the v5 Receive Maximum
+   advertisement automatically.
+
 ---
 
 ## License

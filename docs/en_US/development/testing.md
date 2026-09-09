@@ -194,6 +194,42 @@ The test harness supports stress testing out of the box:
   --stress-clients 10000
 ```
 
+### Standalone load generator (`mqtt-bench`)
+
+For real throughput / latency / connection benchmarks, `oximqtt-bench` builds
+`mqtt-bench`, a standalone tool that implements its own MQTT 3.1.1 and 5.0
+codec (deliberately independent from the broker's protocol code), speaks
+QoS 0/1/2, reports latency percentiles and exports a JSON summary:
+
+```bash
+cargo build -p oximqtt-bench --release
+
+# 20K connections (connect storm)
+./target/release/mqtt-bench v3 -c 20000
+
+# QoS 1 publish saturation on 200 connections for 10s
+./target/release/mqtt-bench v3 -c 200 -P -q 1 -I 0 -d 10
+
+# Subscriber side
+./target/release/mqtt-bench v5 -c 1000 -S -t 'iot/{no}' -d 30
+
+# JSON report
+./target/release/mqtt-bench v3 -c 100 -d 5 --json report.json
+```
+
+Key flags follow `rmqtt-bench`: `-c/--conns`, `-E/--id-pattern`, `-t/--topic`
+(`{no}`/`{pid}`/`{random}`), `-S/--sub`, `-P/--pub`, `-I/--pub-interval`,
+`-q/--qos`, `-R/--topic-no-range`, `-T` churn, `-a` reconnect interval.
+Extras: `-d/--duration`, `--drain`, `-o/--output-interval`, `--json`.
+`-I 0` saturates the connection by filling the inflight window (capped by the
+broker's v5 Receive Maximum when advertised).
+
+> Broker notes: this tree implements the spec-mandated PUBREL reason code
+> `0x02` (`SendOnward`) and applies inbound flow control instead of
+> disconnecting when QoS 2 clients exceed the per-connection `max_inflight`
+> (default 16). Older `oximqtt` binaries need `--v5-pubrel-reason 0` /
+> `--max-inflight 16` for QoS 2 saturation runs.
+
 ---
 
 ## Writing New Tests

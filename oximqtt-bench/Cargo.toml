@@ -1,0 +1,30 @@
+[package]
+name = "oximqtt-bench"
+publish = false
+version = "0.1.0"
+description = "Standalone MQTT benchmark / load generation tool for OXIMQTT broker"
+repository = "https://github.com/zeaphoo/oximqtt/tree/master/oximqtt-bench"
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+exclude.workspace = true
+rust-version.workspace = true
+
+[[bin]]
+name = "mqtt-bench"
+path = "src/main.rs"
+
+# Deliberately independent of the `oximqtt` crate: a benchmark must not speak
+# to the broker through the broker's own protocol code.
+[dependencies]
+tokio = { workspace = true, features = ["full"] }
+bytes = { workspace = true, features = ["serde"] }
+anyhow.workspace = true
+clap.workspace = true
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+tracing.workspace = true
+tracing-subscriber = { workspace = true, features = ["env-filter"] }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["full"] }

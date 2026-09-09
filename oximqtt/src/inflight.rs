@@ -396,6 +396,19 @@ impl InInflight {
         }
     }
 
+    /// Whether `pid` is currently registered (an inbound QoS 2 message that
+    /// has been acknowledged with PUBREC and awaits its PUBREL).
+    #[inline]
+    pub(crate) fn contains(&self, pid: &NonZeroU16) -> bool {
+        self.cached.contains(pid)
+    }
+
+    /// Whether the inbound window is exhausted.
+    #[inline]
+    pub(crate) fn is_full(&self) -> bool {
+        self.cached.len() >= self.max_inflight as usize
+    }
+
     #[inline]
     pub(crate) fn remove(&mut self, pid: &NonZeroU16) -> bool {
         #[allow(clippy::needless_bool)]

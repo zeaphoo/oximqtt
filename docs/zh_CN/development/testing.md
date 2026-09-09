@@ -144,6 +144,40 @@ mod tests {
   --stress-clients 10000
 ```
 
+### 独立压测工具（`mqtt-bench`）
+
+真实吞吐 / 延迟 / 连接数压测请使用 `oximqtt-bench` 构建的 `mqtt-bench`：
+它是一个独立工具，自带 MQTT 3.1.1 / 5.0 编解码器（刻意不依赖 broker 自身的
+协议代码），支持 QoS 0/1/2、延迟分位数和 JSON 报告：
+
+```bash
+cargo build -p oximqtt-bench --release
+
+# 2 万连接风暴
+./target/release/mqtt-bench v3 -c 20000
+
+# 200 连接 QoS1 发布打满 10 秒
+./target/release/mqtt-bench v3 -c 200 -P -q 1 -I 0 -d 10
+
+# 订阅侧
+./target/release/mqtt-bench v5 -c 1000 -S -t 'iot/{no}' -d 30
+
+# JSON 报告（便于脚本 / CI 解析）
+./target/release/mqtt-bench v3 -c 100 -d 5 --json report.json
+```
+
+关键参数与 `rmqtt-bench` 兼容：`-c/--conns`、`-E/--id-pattern`、
+`-t/--topic`（支持 `{no}`/`{pid}`/`{random}`）、`-S/--sub`、`-P/--pub`、
+`-I/--pub-interval`、`-q/--qos`、`-R/--topic-no-range`、`-T` 抖动模式、
+`-a` 重连间隔；扩展参数：`-d/--duration`、`--drain`、`-o/--output-interval`、
+`--json`。`-I 0` 表示打满 inflight 窗口（若 broker 公告 v5 Receive Maximum
+则自动受其限制）。
+
+> QoS2 打满压测注意点：本仓库已支持规范规定的 PUBREL reason code `0x02`
+>（`SendOnward`），并对超出连接级 `max_inflight`（默认 16）的入向 QoS2
+> 做流控（暂缓确认而非断连）。旧版 oximqtt 二进制仍需在 QoS2 打满时加
+> `--v5-pubrel-reason 0` 与 `--max-inflight 16`。
+
 ---
 
 ## 提交前检查清单

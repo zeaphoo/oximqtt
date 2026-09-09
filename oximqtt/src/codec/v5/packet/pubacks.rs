@@ -100,6 +100,8 @@ prim_enum! {
     #[derive(Deserialize, Serialize)]
     pub enum PublishAck2Reason {
         Success = 0,
+        /// PUBREL must carry this reason code (MQTT 5.0 section 3.4.4.1).
+        SendOnward = 2,
         PacketIdNotFound = 146
     }
 }
@@ -114,7 +116,9 @@ impl PublishAck2Reason {
 impl ToReasonCode for PublishAck2Reason {
     fn to_reason_code(&self) -> DisconnectReasonCode {
         match self {
-            PublishAck2Reason::Success => DisconnectReasonCode::NormalDisconnection,
+            PublishAck2Reason::Success | PublishAck2Reason::SendOnward => {
+                DisconnectReasonCode::NormalDisconnection
+            }
             PublishAck2Reason::PacketIdNotFound => DisconnectReasonCode::ImplementationSpecificError,
         }
     }
@@ -124,6 +128,7 @@ impl From<PublishAck2Reason> for u8 {
     fn from(v: PublishAck2Reason) -> Self {
         match v {
             PublishAck2Reason::Success => 0,
+            PublishAck2Reason::SendOnward => 2,
             PublishAck2Reason::PacketIdNotFound => 146,
         }
     }

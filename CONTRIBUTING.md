@@ -192,11 +192,37 @@ python client_test5.py
 ### Performance Benchmarking
 
 ```bash
-# Build release
+# Build the broker and the standalone benchmark tool
 cargo build --release
+cargo build -p oximqtt-bench --release
 
-# Run with benchmark configuration
+# Start a broker (defaults: TCP 1883, anonymous, nodelay on)
+./target/release/oximqttd
+
+# Example scenarios
+./target/release/mqtt-bench v3 -c 20000                  # 20K connections
+./target/release/mqtt-bench v3 -c 200 -P -q 1 -I 0 -d 10  # saturate, QoS 1
+./target/release/mqtt-bench v5 -c 100 -S -P -q 2 \
+  --v5-pubrel-reason 0 --max-inflight 16 -d 10             # QoS 2 (see note)
+
+# JSON report for scripting / CI
+./target/release/mqtt-bench v3 -c 100 -d 5 --json report.json
 ```
+
+`mqtt-bench` (see `oximqtt-bench/`) is a standalone load generator with its own
+MQTT 3.1.1 / 5.0 codec (it does **not** depend on the broker's protocol code),
+QoS 0/1/2, latency percentiles and churn (`-T`) modes. The `stress` suite of
+the `mqtt_harness` test binary remains available for correctness-oriented
+stress tests.
+
+> Interop notes for older releases:
+> - `oximqtt` ≤ 0.22 rejected the spec-mandated MQTT 5.0 PUBREL reason code
+>   `0x02` (Send Onward); that is fixed in this tree (`SendOnward` is part of
+>   the v5 codec now). Against an older broker use `--v5-pubrel-reason 0`.
+> - Before the inbound QoS 2 flow-control fix, exceeding the broker's
+>   per-connection `max_inflight` (default 16) disconnected the client. The
+>   broker now defers surplus QoS 2 publishes until capacity frees; use
+>   `--max-inflight 16` only against older binaries.
 
 ## Documentation
 

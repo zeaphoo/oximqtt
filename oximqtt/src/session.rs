@@ -98,6 +98,11 @@ use crate::types::*;
 use crate::utils::timestamp_millis;
 use crate::Result;
 
+/// Hard bound for the per-connection deferred QoS 2 queue used by inbound flow
+/// control. Beyond it, surplus QoS 2 publishes are left unacknowledged (the
+/// sender retransmits them) instead of buffering without limit.
+const SESSION_QOS2_PENDING_CAP: usize = 4096;
+
 /// Runtime state for an active MQTT session.
 ///
 /// Wraps a [`Session`] with its associated send/receive channels,
@@ -112,6 +117,10 @@ pub struct SessionState {
     pub server_topic_aliases: Option<Arc<ServerTopicAliases>>,
     pub client_topic_aliases: Option<Arc<ClientTopicAliases>>,
     in_inflight: InInflight,
+    /// Inbound QoS 2 publishes deferred by flow control: received while the
+    /// [`InInflight`] window was full, they are processed (delivered, PUBREC'd)
+    /// as soon as an earlier PUBREL frees a slot.
+    qos2_pending: VecDeque<(NonZeroU16, Publish)>,
 }
 
 impl fmt::Debug for SessionState {
@@ -165,6 +174,7 @@ impl SessionState {
             server_topic_aliases,
             client_topic_aliases,
             in_inflight: InInflight::new(scx, max_inflight.get()),
+            qos2_pending: VecDeque::new(),
         }
     }
 
@@ -698,6 +708,8 @@ impl SessionState {
                 log::debug!("{} PublishRelease: {:?}", self.id, packet_id);
                 self.in_inflight.remove(&packet_id);
                 sink.v3_mut().send_publish_complete(packet_id).await?;
+                // A slot freed up: process any QoS 2 publish held by flow control.
+                self.drain_qos2_pending(sink).await?;
             }
             Packet::V5(v5::Packet::PublishRelease(ack2)) => {
                 log::debug!("{} PublishRelease: {:?}", self.id, ack2);
@@ -705,6 +717,8 @@ impl SessionState {
                 sink.v5_mut()
                     .send_publish_complete(PublishAck2 { packet_id: ack2.packet_id, ..Default::default() })
                     .await?;
+                // A slot freed up: process any QoS 2 publish held by flow control.
+                self.drain_qos2_pending(sink).await?;
             }
 
             Packet::V3(v3::Packet::PublishAck { packet_id }) => {
@@ -731,7 +745,13 @@ impl SessionState {
                     .update_status(&ack.packet_id.get(), MomentStatus::UnComplete);
 
                 sink.v5_mut()
-                    .send_publish_release(PublishAck2 { packet_id: ack.packet_id, ..Default::default() })
+                    .send_publish_release(PublishAck2 {
+                        packet_id: ack.packet_id,
+                        // MQTT 5.0 section 3.4.4.1: a PUBREL must carry 0x02
+                        // (Send Onward); clients such as paho enforce this.
+                        reason_code: PublishAck2Reason::SendOnward,
+                        ..Default::default()
+                    })
                     .await?;
             }
 
@@ -883,6 +903,51 @@ impl SessionState {
         packet_id.ok_or_else(|| Reason::ProtocolError(ByteString::from_static("packet_id is None")))
     }
 
+    /// Deliver one inbound QoS 2 publish and acknowledge it with PUBREC,
+    /// registering its packet id so a duplicate cannot be delivered twice.
+    #[inline]
+    async fn ack_qos2_inbound<Io>(
+        &mut self,
+        sink: &mut Sink<Io>,
+        packet_id: NonZeroU16,
+        publish: Publish,
+    ) -> std::result::Result<(), Reason>
+    where
+        Io: AsyncRead + AsyncWrite + Unpin,
+    {
+        let pub_res = self.publish(publish).await?;
+        let inflight_res = if pub_res.is_success() {
+            self.in_inflight.add(packet_id, QoS::ExactlyOnce)?
+        } else {
+            false
+        };
+        let rec_res = sink.send_publish_received(packet_id, pub_res).await;
+        if inflight_res && rec_res.is_err() {
+            self.in_inflight.remove(&packet_id);
+        }
+        rec_res?;
+        Ok(())
+    }
+
+    /// Process deferred QoS 2 publishes while the inbound window has room.
+    #[inline]
+    async fn drain_qos2_pending<Io>(
+        &mut self,
+        sink: &mut Sink<Io>,
+    ) -> std::result::Result<(), Reason>
+    where
+        Io: AsyncRead + AsyncWrite + Unpin,
+    {
+        while let Some((packet_id, publish)) = self.qos2_pending.pop_front() {
+            if self.in_inflight.is_full() {
+                self.qos2_pending.push_front((packet_id, publish));
+                break;
+            }
+            self.ack_qos2_inbound(sink, packet_id, publish).await?;
+        }
+        Ok(())
+    }
+
     #[inline]
     async fn process_publish<Io>(
         &mut self,
@@ -925,14 +990,38 @@ impl SessionState {
             }
             QoS::ExactlyOnce => {
                 let packet_id = Self::packet_id(packet_id)?;
-                let pub_res = self.publish(publish).await?;
-                let inflight_res =
-                    if pub_res.is_success() { self.in_inflight.add(packet_id, qos)? } else { false };
-                let rec_res = sink.send_publish_received(packet_id, pub_res).await;
-                if inflight_res && rec_res.is_err() {
-                    self.in_inflight.remove(&packet_id);
+
+                // Duplicate handling must come first so flow control never
+                // queues the same packet id twice (which would double deliver).
+                if self.qos2_pending.iter().any(|(pid, _)| *pid == packet_id) {
+                    // Already deferred, still unacknowledged: ignore the copy.
+                    return Ok(());
                 }
-                rec_res?;
+                if self.in_inflight.contains(&packet_id) {
+                    // Duplicate PUBLISH of a message we already PUBREC'd (the
+                    // PUBREC was lost): acknowledge it again per MQTT 3.1.1
+                    // section 4.3.3 instead of double delivering.
+                    sink.send_publish_received(packet_id, PublishResult::success()).await?;
+                } else if self.in_inflight.is_full() {
+                    // Flow control: the client sent more concurrent QoS 2
+                    // publishes than the inbound window allows. Defer (do not
+                    // deliver, do not acknowledge) until an earlier PUBREL
+                    // frees a slot, instead of disconnecting a conformant
+                    // client. The sender keeps the message in its own in-flight
+                    // window, so nothing is lost.
+                    if self.qos2_pending.len() >= SESSION_QOS2_PENDING_CAP {
+                        log::warn!(
+                            "{} inbound QoS 2 deferral queue full, packet {} left for sender retry",
+                            self.id,
+                            packet_id
+                        );
+                        self.scx.metrics.client_publish_error_inc();
+                        return Ok(());
+                    }
+                    self.qos2_pending.push_back((packet_id, publish));
+                } else {
+                    self.ack_qos2_inbound(sink, packet_id, publish).await?;
+                }
             }
             QoS::AtMostOnce => {
                 self.publish(publish).await?;
@@ -1467,7 +1556,7 @@ impl SessionState {
             }
             Sink::V5(s) => {
                 let reason_code = if old_packet_id.is_some() {
-                    PublishAck2Reason::Success
+                    PublishAck2Reason::SendOnward
                 } else {
                     PublishAck2Reason::PacketIdNotFound
                 };
