@@ -7,11 +7,13 @@
 use std::path::Path;
 use std::sync::OnceLock;
 
+use anyhow::Context;
+
 use time::{format_description::FormatItem, macros::format_description, OffsetDateTime, UtcOffset};
 use tracing_appender::non_blocking::{self, WorkerGuard};
 use tracing_subscriber::{fmt, fmt::time::FormatTime, layer::SubscriberExt, prelude::*, EnvFilter};
 
-use oximqtt::conf::logging::{Log, To};
+use oximqtt::conf::logging::Log;
 use oximqtt::Result;
 
 /// Prevent log loss on process exit.
@@ -54,7 +56,8 @@ fn build_env_filter(level: &str) -> EnvFilter {
 
 fn build_non_blocking_writer(dir: &str, file: &str) -> Result<non_blocking::NonBlocking> {
     if !Path::new(dir).exists() {
-        std::fs::create_dir_all(dir)?;
+        std::fs::create_dir_all(dir)
+            .with_context(|| format!("failed to create log directory {dir:?}"))?;
     }
 
     let file_appender = tracing_appender::rolling::never(dir, file);
@@ -90,48 +93,42 @@ pub fn logger_init(cfg: &Log) -> Result<()> {
 
     let env_filter = build_env_filter(cfg.level.as_str());
 
-    match cfg.to {
-        To::Console => {
-            tracing_subscriber::registry()
-                .with(
-                    common_layer!(fmt::layer()
-                        .with_writer(std::io::stderr)
-                        .with_timer(LocalTimer::new())
-                        .compact())
-                    .with_filter(env_filter),
-                )
-                .try_init()?;
-        }
+    // File output is opt-in: it requires an explicit, non-empty `log.dir`.
+    // Without one we stay on the console, so a default (or partial) config
+    // never fails on an unwritable path such as `/var/log/oximqtt`.
+    let file_enabled = cfg.to.file() && !cfg.dir.trim().is_empty();
 
-        To::File => {
-            let writer = build_non_blocking_writer(&cfg.dir, &cfg.file)?;
+    let file_layer = if file_enabled {
+        let writer = build_non_blocking_writer(&cfg.dir, &cfg.file)?;
+        Some(
+            common_layer!(fmt::layer().with_writer(writer).with_timer(LocalTimer::new()))
+                .with_filter(env_filter.clone()),
+        )
+    } else {
+        None
+    };
 
-            tracing_subscriber::registry()
-                .with(
-                    common_layer!(fmt::layer().with_writer(writer).with_timer(LocalTimer::new()))
-                        .with_filter(env_filter),
-                )
-                .try_init()?;
-        }
-
-        To::Both => {
-            let writer = build_non_blocking_writer(&cfg.dir, &cfg.file)?;
-
-            let file_filter = env_filter.clone();
-
-            let file_layer = common_layer!(fmt::layer().with_writer(writer).with_timer(LocalTimer::new()))
-                .with_filter(file_filter);
-
-            let console_layer = common_layer!(fmt::layer()
+    // Fall back to the console when file output was requested but unavailable.
+    let console_enabled = cfg.to.console() || !file_enabled;
+    let console_layer = if console_enabled {
+        Some(
+            common_layer!(fmt::layer()
                 .with_writer(std::io::stderr)
                 .with_timer(LocalTimer::new())
                 .compact())
-            .with_filter(env_filter);
+            .with_filter(env_filter),
+        )
+    } else {
+        None
+    };
 
-            tracing_subscriber::registry().with(file_layer).with(console_layer).try_init()?;
-        }
+    tracing_subscriber::registry().with(file_layer).with(console_layer).try_init()?;
 
-        _ => {}
+    if cfg.to.file() && !file_enabled {
+        tracing::warn!(
+            "log.to = {:?} requires a non-empty log.dir; falling back to console output",
+            cfg.to
+        );
     }
 
     Ok(())

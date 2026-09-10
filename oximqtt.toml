@@ -36,11 +36,14 @@ node.busy.handshaking = 0
 ## Log
 ##--------------------------------------------------------------------
 # Value: off | file | console | both
-log.to = "both"
+# Defaults to "console" so the broker runs without a writable log directory.
+log.to = "console"
 # Value: trace, debug, info, warn, error
 log.level = "info"
-log.dir = "/var/log/oximqtt"
-log.file = "oximqtt.log"
+# File logging is opt-in: set log.dir (and log.to = "file"/"both") to enable it.
+# If log.dir is empty, logs go to the console regardless of log.to.
+#log.dir = "/var/log/oximqtt"
+#log.file = "oximqtt.log"
 
 
 ##--------------------------------------------------------------------

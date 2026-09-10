@@ -41,12 +41,16 @@ impl Log {
         Level::Info
     }
     #[inline]
-    fn dir_default() -> String {
-        "/var/log/oximqtt".into()
-    }
-    #[inline]
     fn file_default() -> String {
         "oximqtt.log".into()
+    }
+    /// Default log directory.
+    ///
+    /// Empty by default: file logging is opt-in, so the broker never attempts
+    /// to write (or create) a log directory unless the user configured one.
+    #[inline]
+    fn dir_default() -> String {
+        String::new()
     }
     /// Returns the resolved log file path by joining directory and file name.
     ///
